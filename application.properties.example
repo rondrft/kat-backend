@@ -1,0 +1,41 @@
+# SERVER
+server.port=8080
+
+# DATABASE
+spring.datasource.url=jdbc:postgresql://localhost:5432/kat_db
+spring.datasource.username=
+spring.datasource.password=
+
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# JPA / Hibernate
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.open-in-view=false
+
+# APP
+spring.application.name=kat-backend
+spring.docker.compose.enabled=false
+
+# Discord OAuth2
+discord.client-id=YOUR_DISCORD_CLIENT_ID
+discord.client-secret=YOUR_DISCORD_CLIENT_SECRET
+discord.redirect-uri=http://localhost:3000/auth/callback
+discord.bot-token=YOUR_BOT_TOKEN
+
+# JWT
+jwt.secret=YOUR_JWT_SECRET_BASE64
+jwt.expiration=86400000
+
+# Internal bot communication
+internal.bot-url=http://localhost:8081
+internal.bot.base-url=http://localhost:8081
+internal.api-key=YOUR_INTERNAL_API_KEY
+
+# Uploads
+app.base-url=http://localhost:8080
+app.upload-dir=uploads
+spring.web.resources.static-locations=file:uploads/,classpath:/static/
+spring.mvc.static-path-pattern=/uploads/**

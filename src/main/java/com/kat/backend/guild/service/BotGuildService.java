@@ -1,0 +1,60 @@
+package com.kat.backend.guild.service;
+
+import com.kat.backend.guild.dto.RoleDto;
+import com.kat.backend.guild.dto.SyncReactionPanelRequest;
+import com.kat.backend.guild.dto.TextChannelDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
+
+import java.util.List;
+import java.util.Map;
+
+@Service
+@RequiredArgsConstructor
+public class BotGuildService {
+
+    @Qualifier("botRestClient")
+    private final RestClient botRestClient;
+
+    public List<Map<String, String>> getCategories(String guildId) {
+        return botRestClient.get()
+                .uri("/internal/guilds/{guildId}/categories", guildId)
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<Map<String, String>>>() {});
+    }
+
+    public Map<String, String> provisionVoice(String guildId, Map<String, Object> config) {
+        return botRestClient.post()
+                .uri("/internal/guilds/{guildId}/voice/provision", guildId)
+                .body(config)
+                .retrieve()
+                .body(new ParameterizedTypeReference<Map<String, String>>() {});
+    }
+
+    public List<RoleDto> getRoles(String guildId) {
+        return botRestClient.get()
+                .uri("/internal/guilds/{guildId}/roles", guildId)
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<RoleDto>>() {});
+    }
+
+    public List<TextChannelDto> getTextChannels(String guildId) {
+        return botRestClient.get()
+                .uri("/internal/guilds/{guildId}/channels/text", guildId)
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<TextChannelDto>>() {});
+    }
+
+    public String syncReactionPanel(String guildId, SyncReactionPanelRequest request) {
+        Map<String, String> response = botRestClient.post()
+                .uri("/internal/guilds/{guildId}/autoroles/sync", guildId)
+                .body(request)
+                .retrieve()
+                .body(new ParameterizedTypeReference<Map<String, String>>() {});
+
+        return response != null ? response.get("messageId") : null;
+    }
+}
