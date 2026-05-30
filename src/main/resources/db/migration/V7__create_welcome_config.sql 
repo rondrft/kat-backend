@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS welcome_config (
+    guild_id                VARCHAR(255) NOT NULL,
+    welcome_enabled         BOOLEAN      NOT NULL DEFAULT false,
+    boost_enabled           BOOLEAN      NOT NULL DEFAULT false,
+    welcome_channel_id      VARCHAR(255),
+    boost_channel_id        VARCHAR(255),
+    welcome_output_type     VARCHAR(255) NOT NULL DEFAULT 'IMAGE',
+    boost_output_type       VARCHAR(255) NOT NULL DEFAULT 'IMAGE',
+    message_template        VARCHAR(500) NOT NULL DEFAULT 'Welcome {userMention} to {server}!',
+    embed_title_template    VARCHAR(256),
+    embed_color             VARCHAR(7),
+    image_title_template    VARCHAR(256) NOT NULL DEFAULT 'Welcome to {server}',
+    image_username_template VARCHAR(256) NOT NULL DEFAULT '{user}!',
+    image_footer_template   VARCHAR(256) NOT NULL DEFAULT 'Member #{count}',
+    image_background_mode   VARCHAR(10)  NOT NULL DEFAULT 'COLOR',
+    image_background_color  VARCHAR(7)   NOT NULL DEFAULT '#DCEBFF',
+    image_background_url    VARCHAR(512),
+    image_show_avatar       BOOLEAN      NOT NULL DEFAULT true,
+    image_text_color        VARCHAR(7)   NOT NULL DEFAULT '#0F172A',
+    image_mention_user      BOOLEAN      NOT NULL DEFAULT false,
+    CONSTRAINT welcome_config_pkey PRIMARY KEY (guild_id)
+);
