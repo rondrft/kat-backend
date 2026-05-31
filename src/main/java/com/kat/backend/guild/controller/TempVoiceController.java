@@ -4,6 +4,7 @@ import com.kat.backend.common.ApiResponse;
 import com.kat.backend.guild.dto.TempVoiceConfigRequest;
 import com.kat.backend.guild.dto.TempVoiceConfigResponse;
 import com.kat.backend.guild.service.TempVoiceService;
+import com.kat.backend.security.GuildAdmin;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,6 +26,7 @@ public class TempVoiceController {
     }
 
     @PutMapping
+    @GuildAdmin
     public ResponseEntity<ApiResponse<TempVoiceConfigResponse>> saveConfig(
             @PathVariable String guildId,
             @RequestBody TempVoiceConfigRequest request,
