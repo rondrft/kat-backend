@@ -12,12 +12,11 @@ public class ModerationBotClient {
     private final RestClient restClient;
 
     public ModerationBotClient(
-            RestClient.Builder builder,
-            @Value("${internal.bot-url}") String botUrl,
+            @Value("${internal.bot.base-url}") String botBaseUrl,
             @Value("${internal.api-key}") String apiKey
     ) {
-        this.restClient = builder
-                .baseUrl(botUrl)
+        this.restClient = RestClient.builder()
+                .baseUrl(botBaseUrl)
                 .defaultHeader("X-Internal-Api-Key", apiKey)
                 .build();
     }
