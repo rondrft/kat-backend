@@ -26,4 +26,7 @@ public class ModerationRuleDto {
 
     @Min(1) @Max(100)
     private int threshold;
+
+    @Min(1) @Max(1440)
+    private Integer timeoutMinutes;
 }

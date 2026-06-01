@@ -42,4 +42,7 @@ public class ModerationRuleConfig {
     @Column(name = "threshold", nullable = false)
     @Builder.Default
     private int threshold = 5;
+
+    @Column(name = "timeout_minutes", nullable = true)
+    private Integer timeoutMinutes;
 }

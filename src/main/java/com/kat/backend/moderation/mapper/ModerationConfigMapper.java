@@ -14,19 +14,25 @@ import java.util.stream.Collectors;
 public class ModerationConfigMapper {
 
     private static final List<ModerationRuleDto> DEFAULT_RULES = List.of(
-            buildDefaultRule(ModerationRuleType.SPAM,     ModerationAction.DELETE,   6),
-            buildDefaultRule(ModerationRuleType.LINKS,    ModerationAction.DELETE,   2),
-            buildDefaultRule(ModerationRuleType.INVITES,  ModerationAction.DELETE,   1),
-            buildDefaultRule(ModerationRuleType.MENTIONS, ModerationAction.TIMEOUT,  5),
-            buildDefaultRule(ModerationRuleType.CAPS,     ModerationAction.MONITOR, 80)
+            buildDefaultRule(ModerationRuleType.SPAM,     ModerationAction.DELETE,   6,  null),
+            buildDefaultRule(ModerationRuleType.LINKS,    ModerationAction.DELETE,   2,  null),
+            buildDefaultRule(ModerationRuleType.INVITES,  ModerationAction.DELETE,   1,  null),
+            buildDefaultRule(ModerationRuleType.MENTIONS, ModerationAction.TIMEOUT,  5,  null),
+            buildDefaultRule(ModerationRuleType.CAPS,     ModerationAction.MONITOR, 80,  null)
     );
 
-    private static ModerationRuleDto buildDefaultRule(ModerationRuleType type, ModerationAction action, int threshold) {
+    private static ModerationRuleDto buildDefaultRule(
+            ModerationRuleType type,
+            ModerationAction action,
+            int threshold,
+            Integer timeoutMinutes
+    ) {
         return ModerationRuleDto.builder()
                 .id(type)
                 .enabled(false)
                 .action(action)
                 .threshold(threshold)
+                .timeoutMinutes(timeoutMinutes)
                 .build();
     }
 
@@ -43,6 +49,7 @@ public class ModerationConfigMapper {
                                 .enabled(rule.isEnabled())
                                 .action(rule.getAction())
                                 .threshold(rule.getThreshold())
+                                .timeoutMinutes(rule.getTimeoutMinutes())
                                 .build();
                     }
                     return DEFAULT_RULES.stream()
@@ -91,6 +98,7 @@ public class ModerationConfigMapper {
             rule.setEnabled(ruleDto.isEnabled());
             rule.setAction(ruleDto.getAction());
             rule.setThreshold(ruleDto.getThreshold());
+            rule.setTimeoutMinutes(ruleDto.getTimeoutMinutes());
             entity.getRules().add(rule);
         }
     }

@@ -1,5 +1,6 @@
 package com.kat.backend.moderation.service;
 
+import com.kat.backend.moderation.client.ModerationBotClient;
 import com.kat.backend.moderation.dto.ModerationConfigDto;
 import com.kat.backend.moderation.entity.ModerationConfig;
 import com.kat.backend.moderation.mapper.ModerationConfigMapper;
@@ -17,6 +18,7 @@ public class ModerationService {
 
     private final ModerationConfigRepository repository;
     private final ModerationConfigMapper mapper;
+    private final ModerationBotClient moderationBotClient;
 
     @Transactional(readOnly = true)
     public ModerationConfigDto getConfig(String guildId) {
@@ -38,6 +40,9 @@ public class ModerationService {
 
         ModerationConfig saved = repository.save(entity);
         log.info("Moderation config saved for guild {}", guildId);
+
+        moderationBotClient.invalidateModerationCache(guildId);
+
         return mapper.toDto(saved);
     }
 }
