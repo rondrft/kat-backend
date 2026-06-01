@@ -12,4 +12,6 @@ public interface BoosterCustomRoleRepository extends JpaRepository<BoosterCustom
     Optional<BoosterCustomRole> findByGuildIdAndOwnerDiscordId(String guildId, String ownerDiscordId);
 
     List<BoosterCustomRole> findAllByGuildId(String guildId);
+
+    long countByGuildId(String guildId);
 }

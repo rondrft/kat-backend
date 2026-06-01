@@ -5,6 +5,7 @@ import com.kat.backend.discord.DiscordGuildResponse;
 import com.kat.backend.guild.dto.*;
 import com.kat.backend.guild.service.BotGuildService;
 import com.kat.backend.guild.service.GuildService;
+import com.kat.backend.guild.service.GuildStatsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,6 +21,7 @@ public class GuildController {
 
     private final GuildService guildService;
     private final BotGuildService botGuildService;
+    private final GuildStatsService  guildStatsService;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<DiscordGuildResponse>>> getUserGuilds(
@@ -83,5 +85,13 @@ public class GuildController {
         return ResponseEntity.ok(
                 ApiResponse.ok(botGuildService.getTextChannels(guildId))
         );
+    }
+
+    @GetMapping("/{guildId}/stats")
+    public ResponseEntity<ApiResponse<GuildStatsDto>> getGuildStats(
+            @PathVariable String guildId,
+            @AuthenticationPrincipal String discordId) {
+
+        return ResponseEntity.ok(ApiResponse.ok(guildStatsService.getStats(guildId)));
     }
 }
