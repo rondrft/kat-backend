@@ -28,6 +28,10 @@ public class WelcomeConfigMapper {
                 .imageShowAvatar(entity.isImageShowAvatar())
                 .imageTextColor(entity.getImageTextColor())
                 .imageMentionUser(entity.isImageMentionUser())
+                .imageCardEnabled(entity.isImageCardEnabled())
+                .imageCardColor(entity.getImageCardColor())
+                .imageCardOpacity(entity.getImageCardOpacity())
+                .imageAvatarSize(entity.getImageAvatarSize())
                 .build();
     }
 
@@ -54,6 +58,10 @@ public class WelcomeConfigMapper {
                 .imageTextColor(dto.getImageTextColor() != null
                         ? dto.getImageTextColor() : "#0F172A")
                 .imageMentionUser(dto.isImageMentionUser())
+                .imageCardEnabled(dto.isImageCardEnabled())
+                .imageCardColor(dto.getImageCardColor() != null ? dto.getImageCardColor() : "#000000")
+                .imageCardOpacity(dto.getImageCardOpacity() > 0 ? dto.getImageCardOpacity() : 120)
+                .imageAvatarSize(dto.getImageAvatarSize() > 0 ? dto.getImageAvatarSize() : 140)
                 .build();
     }
 
@@ -73,6 +81,10 @@ public class WelcomeConfigMapper {
                 .imageShowAvatar(true)
                 .imageTextColor("#0F172A")
                 .imageMentionUser(false)
+                .imageCardEnabled(true)
+                .imageCardColor("#000000")
+                .imageCardOpacity(120)
+                .imageAvatarSize(140)
                 .build();
     }
 }

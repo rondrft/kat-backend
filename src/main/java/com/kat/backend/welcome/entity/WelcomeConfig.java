@@ -71,4 +71,16 @@ public class WelcomeConfig {
 
     @Column(name = "image_mention_user", nullable = false)
     private boolean imageMentionUser;
+
+    @Column(name = "image_card_enabled")
+    private boolean imageCardEnabled;
+
+    @Column(name = "image_card_color")
+    private String imageCardColor;
+
+    @Column(name = "image_card_opacity")
+    private int imageCardOpacity;
+
+    @Column(name = "image_avatar_size")
+    private int imageAvatarSize;
 }

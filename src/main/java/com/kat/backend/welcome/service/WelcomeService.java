@@ -55,18 +55,14 @@ public class WelcomeService {
     }
 
     public String saveBackground(String guildId, MultipartFile file) throws IOException {
-        if (file.isEmpty()) {
-            throw new IllegalArgumentException("File is empty");
-        }
+        if (file.isEmpty()) throw new IllegalArgumentException("File is empty");
 
         String contentType = file.getContentType();
-        if (contentType == null || !ALLOWED_TYPES.contains(contentType)) {
+        if (contentType == null || !ALLOWED_TYPES.contains(contentType))
             throw new IllegalArgumentException("Invalid file type. Allowed: png, jpeg, webp");
-        }
 
-        if (file.getSize() > MAX_FILE_SIZE) {
+        if (file.getSize() > MAX_FILE_SIZE)
             throw new IllegalArgumentException("File exceeds maximum size of 5MB");
-        }
 
         Path uploadPath = Paths.get(uploadDir, "backgrounds");
         Files.createDirectories(uploadPath);
@@ -78,10 +74,10 @@ public class WelcomeService {
 
         String url = appBaseUrl + "/uploads/backgrounds/" + filename;
 
-        repository.findById(guildId).ifPresent(config -> {
-            config.setImageBackgroundUrl(url);
-            repository.save(config);
-        });
+        WelcomeConfig config = repository.findById(guildId)
+                .orElse(mapper.defaults(guildId));
+        config.setImageBackgroundUrl(url);
+        repository.save(config);
 
         return url;
     }

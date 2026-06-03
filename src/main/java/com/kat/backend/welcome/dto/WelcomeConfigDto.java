@@ -56,4 +56,12 @@ public class WelcomeConfigDto {
     private String imageTextColor;
 
     private boolean imageMentionUser;
+
+    private boolean imageCardEnabled;
+
+    @Pattern(regexp = "^#[0-9A-Fa-f]{6}$", message = "imageCardColor must be a valid hex color")
+    private String imageCardColor;
+
+    private int imageCardOpacity;
+    private int imageAvatarSize;
 }
