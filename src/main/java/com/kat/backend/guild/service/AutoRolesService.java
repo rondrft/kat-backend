@@ -1,10 +1,12 @@
 package com.kat.backend.guild.service;
 
+import com.kat.backend.common.ApiResponse;
 import com.kat.backend.common.EmojiUtil;
 import com.kat.backend.guild.dto.*;
 import com.kat.backend.guild.entity.GuildAutoRolesConfig;
 import com.kat.backend.guild.entity.ReactionRoleMapping;
 import com.kat.backend.guild.repository.GuildAutoRolesConfigRepository;
+import com.kat.backend.premium.service.PremiumService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,7 @@ public class AutoRolesService {
 
     private final GuildAutoRolesConfigRepository repository;
     private final BotGuildService botGuildService;
+    private final PremiumService premiumService;
 
     @Transactional(readOnly = true)
     public AutoRolesConfigResponse getConfig(String guildId) {
@@ -50,6 +53,11 @@ public class AutoRolesService {
         config.setReactionEmbedColor(request.getReactionEmbedColor());
 
         if (request.getReactionMappings() != null) {
+            int limit = premiumService.getReactionRolesLimit(guildId);
+            if (request.getReactionMappings().size() > limit) {
+                throw new IllegalArgumentException(
+                        "Free guilds can only configure up to " + limit + " reaction role mappings.");
+            }
             config.setReactionMappings(new ArrayList<>(request.getReactionMappings().stream()
                     .map(dto -> {
                         ReactionRoleMapping m = new ReactionRoleMapping();
