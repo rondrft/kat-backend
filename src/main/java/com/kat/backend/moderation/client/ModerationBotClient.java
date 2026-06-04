@@ -1,5 +1,7 @@
 package com.kat.backend.moderation.client;
 
+import com.kat.backend.moderation.dto.ModPermissionDto;
+import com.kat.backend.moderation.dto.PurgeConfigDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -32,4 +34,53 @@ public class ModerationBotClient {
             log.warn("Failed to invalidate moderation cache for guild {}: {}", guildId, e.getMessage());
         }
     }
+
+    public void savePermissions(String guildId, ModPermissionDto dto) {
+        try {
+            restClient.put()
+                    .uri("/internal/guilds/{guildId}/moderation/permissions", guildId)
+                    .body(dto)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (Exception e) {
+            log.error("Failed to save mod permissions for guild {}: {}", guildId, e.getMessage());
+        }
+    }
+
+    public void savePurgeConfig(String guildId, PurgeConfigDto dto) {
+        try {
+            restClient.put()
+                    .uri("/internal/guilds/{guildId}/moderation/purge", guildId)
+                    .body(dto)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (Exception e) {
+            log.error("Failed to save purge config for guild {}: {}", guildId, e.getMessage());
+        }
+    }
+
+    public ModPermissionDto getPermissions(String guildId) {
+        try {
+            return restClient.get()
+                    .uri("/internal/guilds/{guildId}/moderation/permissions", guildId)
+                    .retrieve()
+                    .body(ModPermissionDto.class);
+        } catch (Exception e) {
+            log.error("Failed to fetch mod permissions for guild {}: {}", guildId, e.getMessage());
+            return new ModPermissionDto();
+        }
+    }
+
+    public PurgeConfigDto getPurgeConfig(String guildId) {
+        try {
+            return restClient.get()
+                    .uri("/internal/guilds/{guildId}/moderation/purge", guildId)
+                    .retrieve()
+                    .body(PurgeConfigDto.class);
+        } catch (Exception e) {
+            log.error("Failed to fetch purge config for guild {}: {}", guildId, e.getMessage());
+            return new PurgeConfigDto();
+        }
+    }
+
 }

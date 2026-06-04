@@ -1,14 +1,17 @@
 package com.kat.backend.moderation.controller;
 
 import com.kat.backend.common.ApiResponse;
+import com.kat.backend.moderation.dto.ModPermissionDto;
 import com.kat.backend.moderation.dto.ModerationConfigDto;
 import com.kat.backend.moderation.dto.ModerationLogPageDto;
+import com.kat.backend.moderation.dto.PurgeConfigDto;
 import com.kat.backend.moderation.service.ModerationLogService;
 import com.kat.backend.moderation.service.ModerationService;
 import com.kat.backend.security.GuildAdmin;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,7 +23,8 @@ public class ModerationController {
     private final ModerationLogService moderationLogService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<ModerationConfigDto>> getConfig(@PathVariable String guildId) {
+    public ResponseEntity<ApiResponse<ModerationConfigDto>> getConfig(
+            @PathVariable String guildId) {
         return ResponseEntity.ok(ApiResponse.ok(moderationService.getConfig(guildId)));
     }
 
@@ -28,8 +32,7 @@ public class ModerationController {
     @GuildAdmin
     public ResponseEntity<ApiResponse<ModerationConfigDto>> saveConfig(
             @PathVariable String guildId,
-            @Valid @RequestBody ModerationConfigDto dto
-    ) {
+            @Valid @RequestBody ModerationConfigDto dto) {
         return ResponseEntity.ok(ApiResponse.ok(moderationService.saveConfig(guildId, dto)));
     }
 
@@ -37,8 +40,39 @@ public class ModerationController {
     public ResponseEntity<ApiResponse<ModerationLogPageDto>> getLogs(
             @PathVariable String guildId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
+            @RequestParam(defaultValue = "20") int size) {
         return ResponseEntity.ok(ApiResponse.ok(moderationLogService.getLogs(guildId, page, size)));
+    }
+
+    @GetMapping("/permissions")
+    public ResponseEntity<ApiResponse<ModPermissionDto>> getPermissions(
+            @PathVariable String guildId,
+            @AuthenticationPrincipal String discordId) {
+        return ResponseEntity.ok(ApiResponse.ok(moderationService.getPermissions(guildId)));
+    }
+
+    @PutMapping("/permissions")
+    @GuildAdmin
+    public ResponseEntity<ApiResponse<ModPermissionDto>> savePermissions(
+            @PathVariable String guildId,
+            @AuthenticationPrincipal String discordId,
+            @RequestBody ModPermissionDto dto) {
+        return ResponseEntity.ok(ApiResponse.ok(moderationService.savePermissions(guildId, dto)));
+    }
+
+    @GetMapping("/purge")
+    public ResponseEntity<ApiResponse<PurgeConfigDto>> getPurgeConfig(
+            @PathVariable String guildId,
+            @AuthenticationPrincipal String discordId) {
+        return ResponseEntity.ok(ApiResponse.ok(moderationService.getPurgeConfig(guildId)));
+    }
+
+    @PutMapping("/purge")
+    @GuildAdmin
+    public ResponseEntity<ApiResponse<PurgeConfigDto>> savePurgeConfig(
+            @PathVariable String guildId,
+            @AuthenticationPrincipal String discordId,
+            @RequestBody PurgeConfigDto dto) {
+        return ResponseEntity.ok(ApiResponse.ok(moderationService.savePurgeConfig(guildId, dto)));
     }
 }

@@ -1,7 +1,9 @@
 package com.kat.backend.moderation.service;
 
 import com.kat.backend.moderation.client.ModerationBotClient;
+import com.kat.backend.moderation.dto.ModPermissionDto;
 import com.kat.backend.moderation.dto.ModerationConfigDto;
+import com.kat.backend.moderation.dto.PurgeConfigDto;
 import com.kat.backend.moderation.entity.ModerationConfig;
 import com.kat.backend.moderation.mapper.ModerationConfigMapper;
 import com.kat.backend.moderation.repository.ModerationConfigRepository;
@@ -44,5 +46,25 @@ public class ModerationService {
         moderationBotClient.invalidateModerationCache(guildId);
 
         return mapper.toDto(saved);
+    }
+
+    public ModPermissionDto getPermissions(String guildId) {
+        return moderationBotClient.getPermissions(guildId);
+    }
+
+    @Transactional
+    public ModPermissionDto savePermissions(String guildId, ModPermissionDto dto) {
+        moderationBotClient.savePermissions(guildId, dto);
+        return dto;
+    }
+
+    public PurgeConfigDto getPurgeConfig(String guildId) {
+        return moderationBotClient.getPurgeConfig(guildId);
+    }
+
+    @Transactional
+    public PurgeConfigDto savePurgeConfig(String guildId, PurgeConfigDto dto) {
+        moderationBotClient.savePurgeConfig(guildId, dto);
+        return dto;
     }
 }
