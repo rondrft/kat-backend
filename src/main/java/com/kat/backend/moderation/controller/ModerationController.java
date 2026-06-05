@@ -4,6 +4,7 @@ import com.kat.backend.common.ApiResponse;
 import com.kat.backend.moderation.dto.ModPermissionDto;
 import com.kat.backend.moderation.dto.ModerationConfigDto;
 import com.kat.backend.moderation.dto.ModerationLogPageDto;
+import com.kat.backend.moderation.dto.NukeConfigDto;
 import com.kat.backend.moderation.dto.PurgeConfigDto;
 import com.kat.backend.moderation.service.ModerationLogService;
 import com.kat.backend.moderation.service.ModerationService;
@@ -74,5 +75,21 @@ public class ModerationController {
             @AuthenticationPrincipal String discordId,
             @RequestBody PurgeConfigDto dto) {
         return ResponseEntity.ok(ApiResponse.ok(moderationService.savePurgeConfig(guildId, dto)));
+    }
+
+    @GetMapping("/nuke")
+    public ResponseEntity<ApiResponse<NukeConfigDto>> getNukeConfig(
+            @PathVariable String guildId,
+            @AuthenticationPrincipal String discordId) {
+        return ResponseEntity.ok(ApiResponse.ok(moderationService.getNukeConfig(guildId)));
+    }
+
+    @PutMapping("/nuke")
+    @GuildAdmin
+    public ResponseEntity<ApiResponse<NukeConfigDto>> saveNukeConfig(
+            @PathVariable String guildId,
+            @AuthenticationPrincipal String discordId,
+            @RequestBody NukeConfigDto dto) {
+        return ResponseEntity.ok(ApiResponse.ok(moderationService.saveNukeConfig(guildId, dto)));
     }
 }

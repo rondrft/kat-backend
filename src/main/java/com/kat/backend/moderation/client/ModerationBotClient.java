@@ -1,6 +1,7 @@
 package com.kat.backend.moderation.client;
 
 import com.kat.backend.moderation.dto.ModPermissionDto;
+import com.kat.backend.moderation.dto.NukeConfigDto;
 import com.kat.backend.moderation.dto.PurgeConfigDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,18 +48,6 @@ public class ModerationBotClient {
         }
     }
 
-    public void savePurgeConfig(String guildId, PurgeConfigDto dto) {
-        try {
-            restClient.put()
-                    .uri("/internal/guilds/{guildId}/moderation/purge", guildId)
-                    .body(dto)
-                    .retrieve()
-                    .toBodilessEntity();
-        } catch (Exception e) {
-            log.error("Failed to save purge config for guild {}: {}", guildId, e.getMessage());
-        }
-    }
-
     public ModPermissionDto getPermissions(String guildId) {
         try {
             return restClient.get()
@@ -68,6 +57,18 @@ public class ModerationBotClient {
         } catch (Exception e) {
             log.error("Failed to fetch mod permissions for guild {}: {}", guildId, e.getMessage());
             return new ModPermissionDto();
+        }
+    }
+
+    public void savePurgeConfig(String guildId, PurgeConfigDto dto) {
+        try {
+            restClient.put()
+                    .uri("/internal/guilds/{guildId}/moderation/purge", guildId)
+                    .body(dto)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (Exception e) {
+            log.error("Failed to save purge config for guild {}: {}", guildId, e.getMessage());
         }
     }
 
@@ -83,4 +84,27 @@ public class ModerationBotClient {
         }
     }
 
+    public void saveNukeConfig(String guildId, NukeConfigDto dto) {
+        try {
+            restClient.put()
+                    .uri("/internal/guilds/{guildId}/moderation/nuke", guildId)
+                    .body(dto)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (Exception e) {
+            log.error("Failed to save nuke config for guild {}: {}", guildId, e.getMessage());
+        }
+    }
+
+    public NukeConfigDto getNukeConfig(String guildId) {
+        try {
+            return restClient.get()
+                    .uri("/internal/guilds/{guildId}/moderation/nuke", guildId)
+                    .retrieve()
+                    .body(NukeConfigDto.class);
+        } catch (Exception e) {
+            log.error("Failed to fetch nuke config for guild {}: {}", guildId, e.getMessage());
+            return new NukeConfigDto();
+        }
+    }
 }
