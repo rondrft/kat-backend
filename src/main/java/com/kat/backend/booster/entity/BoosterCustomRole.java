@@ -39,6 +39,9 @@ public class BoosterCustomRole {
     @Column(name = "role_emoji")
     private String roleEmoji;
 
+    @Column(name = "guild_emoji_id")
+    private String guildEmojiId;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 }
