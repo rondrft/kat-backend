@@ -21,4 +21,8 @@ public interface ModerationLogRepository extends JpaRepository<ModerationLog, UU
     @Modifying
     @Query("DELETE FROM ModerationLog l WHERE l.createdAt < :cutoff")
     int deleteOlderThan(@Param("cutoff") Instant cutoff);
+
+    @Modifying
+    @Query(value = "DELETE FROM moderation_logs WHERE created_at < :cutoff LIMIT :limit", nativeQuery = true)
+    int deleteOlderThan(@Param("cutoff") Instant cutoff, @Param("limit") int limit);
 }

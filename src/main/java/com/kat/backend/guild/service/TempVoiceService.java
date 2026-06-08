@@ -5,6 +5,8 @@ import com.kat.backend.guild.dto.TempVoiceConfigResponse;
 import com.kat.backend.guild.entity.GuildTempVoiceConfig;
 import com.kat.backend.guild.repository.GuildTempVoiceConfigRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +19,7 @@ public class TempVoiceService {
     private final GuildTempVoiceConfigRepository repository;
     private final BotGuildService botGuildService;
 
+    @Cacheable(value = "tempVoiceConfigs", key = "#guildId", unless = "#result == null")
     public TempVoiceConfigResponse getConfig(String guildId) {
         return repository.findById(guildId)
                 .map(this::toResponse)
@@ -24,6 +27,7 @@ public class TempVoiceService {
     }
 
     @Transactional
+    @CacheEvict(value = "tempVoiceConfigs", key = "#guildId")
     public TempVoiceConfigResponse saveConfig(String guildId, TempVoiceConfigRequest request) {
         GuildTempVoiceConfig config = repository.findById(guildId)
                 .orElse(GuildTempVoiceConfig.builder().guildId(guildId).build());

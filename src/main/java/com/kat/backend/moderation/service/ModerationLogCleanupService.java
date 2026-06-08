@@ -16,6 +16,7 @@ import java.time.temporal.ChronoUnit;
 public class ModerationLogCleanupService {
 
     private static final int RETENTION_DAYS = 30;
+    private static final int BATCH_SIZE = 1000;
 
     private final ModerationLogRepository repository;
 
@@ -23,7 +24,12 @@ public class ModerationLogCleanupService {
     @Transactional
     public void cleanOldLogs() {
         Instant cutoff = Instant.now().minus(RETENTION_DAYS, ChronoUnit.DAYS);
-        int deleted = repository.deleteOlderThan(cutoff);
-        log.info("Moderation log cleanup: deleted {} entries older than {} days", deleted, RETENTION_DAYS);
+        int totalDeleted = 0;
+        int deleted;
+        do {
+            deleted = repository.deleteOlderThan(cutoff, BATCH_SIZE);
+            totalDeleted += deleted;
+        } while (deleted == BATCH_SIZE);
+        log.info("Moderation log cleanup: deleted {} entries older than {} days", totalDeleted, RETENTION_DAYS);
     }
 }

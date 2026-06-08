@@ -1,5 +1,6 @@
 package com.kat.backend.config;
 
+import com.kat.backend.security.InternalApiFilter;
 import com.kat.backend.security.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +19,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            CorsConfigurationSource corsConfigurationSource,
-                                           JwtFilter jwtFilter) throws Exception {
+                                           JwtFilter jwtFilter,
+                                           InternalApiFilter internalApiFilter) throws Exception {
         http
                 .cors(cors ->
                         cors.configurationSource(corsConfigurationSource)
@@ -30,8 +32,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers("/internal/**").permitAll()
+                        .requestMatchers("/health").permitAll()
                         .anyRequest().authenticated()
                 )
+                .addFilterBefore(internalApiFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

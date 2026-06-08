@@ -17,9 +17,11 @@ public class RateLimitConfig implements WebMvcConfigurer {
         registry.addInterceptor(rateLimitInterceptor)
                 .addPathPatterns(
                         "/auth/discord/callback",
-                        "/guilds/*/boosters/settings",
-                        "/guilds/*/welcomes",
-                        "/guilds/*/welcomes/background"
+                        "/guilds/*/boosters/**",
+                        "/guilds/*/welcomes/**",
+                        "/guilds/*/autoroles/**",
+                        "/guilds/*/voice/**",
+                        "/guilds/*/moderation/**"
                 );
     }
 }

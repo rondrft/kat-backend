@@ -8,6 +8,8 @@ import com.kat.backend.guild.entity.ReactionRoleMapping;
 import com.kat.backend.guild.repository.GuildAutoRolesConfigRepository;
 import com.kat.backend.premium.service.PremiumService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,7 @@ public class AutoRolesService {
     private final PremiumService premiumService;
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "autoRolesConfigs", key = "#guildId", unless = "#result == null")
     public AutoRolesConfigResponse getConfig(String guildId) {
         GuildAutoRolesConfig config = repository.findById(guildId)
                 .orElse(new GuildAutoRolesConfig());
@@ -29,6 +32,7 @@ public class AutoRolesService {
     }
 
     @Transactional
+    @CacheEvict(value = "autoRolesConfigs", key = "#guildId")
     public AutoRolesConfigResponse saveConfig(String guildId, AutoRolesConfigRequest request) {
         GuildAutoRolesConfig config = repository.findById(guildId)
                 .orElseGet(() -> {

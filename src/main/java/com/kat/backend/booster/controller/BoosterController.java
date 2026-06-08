@@ -7,11 +7,12 @@ import com.kat.backend.booster.service.BoosterService;
 import com.kat.backend.common.ApiResponse;
 import com.kat.backend.security.GuildAdmin;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -31,11 +32,12 @@ public class BoosterController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<BoosterCustomRoleResponse>>> getAllCustomRoles(
+    public ResponseEntity<ApiResponse<Page<BoosterCustomRoleResponse>>> getAllCustomRoles(
             @PathVariable String guildId,
-            @AuthenticationPrincipal String discordId) {
+            @AuthenticationPrincipal String discordId,
+            Pageable pageable) {
 
-        List<BoosterCustomRoleResponse> response = boosterService.getAllCustomRoles(guildId);
+        Page<BoosterCustomRoleResponse> response = boosterService.getAllCustomRoles(guildId, pageable);
         return ResponseEntity.ok(ApiResponse.ok(response));
     }
 

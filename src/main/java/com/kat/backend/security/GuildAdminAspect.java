@@ -1,6 +1,6 @@
 package com.kat.backend.security;
 
-import com.kat.backend.guild.client.GuildPermissionClient;
+import com.kat.backend.guild.service.AdminPermissionService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -21,7 +21,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class GuildAdminAspect {
 
-    private final GuildPermissionClient guildPermissionClient;
+    private final AdminPermissionService adminPermissionService;
 
     @Around("@annotation(GuildAdmin)")
     public Object checkGuildAdmin(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -40,7 +40,7 @@ public class GuildAdminAspect {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing guildId");
         }
 
-        if (!guildPermissionClient.isAdmin(guildId, discordId)) {
+        if (!adminPermissionService.isAdmin(guildId, discordId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "You don't have admin permissions in this guild");
         }

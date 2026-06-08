@@ -9,6 +9,10 @@ import com.kat.backend.booster.repository.BoosterConfigRepository;
 import com.kat.backend.booster.repository.BoosterCustomRoleRepository;
 import com.kat.backend.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +29,7 @@ public class BoosterService {
         return boosterBotClient.syncBoosters(guildId);
     }
 
+    @Cacheable(value = "boosterCustomRoles", key = "#guildId + ':' + #discordId", unless = "#result == null")
     public BoosterCustomRoleResponse getMyCustomRole(String guildId, String discordId) {
         return boosterCustomRoleRepository
                 .findByGuildIdAndOwnerDiscordId(guildId, discordId)
@@ -33,14 +38,13 @@ public class BoosterService {
                         "No custom role found for user " + discordId + " in guild " + guildId));
     }
 
-    public List<BoosterCustomRoleResponse> getAllCustomRoles(String guildId) {
+    public Page<BoosterCustomRoleResponse> getAllCustomRoles(String guildId, Pageable pageable) {
         return boosterCustomRoleRepository
-                .findAllByGuildId(guildId)
-                .stream()
-                .map(BoosterCustomRoleResponse::from)
-                .toList();
+                .findAllByGuildId(guildId, pageable)
+                .map(BoosterCustomRoleResponse::from);
     }
 
+    @Cacheable(value = "boosterSettings", key = "#guildId", unless = "#result == null")
     public BoosterConfigResponse getSettings(String guildId) {
         return boosterConfigRepository.findById(guildId)
                 .map(BoosterConfigResponse::from)
@@ -52,6 +56,7 @@ public class BoosterService {
                         .build());
     }
 
+    @CacheEvict(value = {"boosterSettings", "boosterCustomRoles"}, allEntries = true)
     public BoosterConfigResponse updateSettings(String guildId, BoosterConfigRequest request) {
         BoosterConfig config = boosterConfigRepository.findById(guildId)
                 .orElse(BoosterConfig.builder().guildId(guildId).build());
