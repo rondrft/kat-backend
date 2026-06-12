@@ -1,5 +1,6 @@
 package com.kat.backend.guild.service;
 
+import com.kat.backend.guild.dto.ActionsConfigRequest;
 import com.kat.backend.guild.dto.RoleDto;
 import com.kat.backend.guild.dto.SyncReactionPanelRequest;
 import com.kat.backend.guild.dto.TextChannelDto;
@@ -46,6 +47,21 @@ public class BotGuildService {
                 .uri("/internal/guilds/{guildId}/channels/text", guildId)
                 .retrieve()
                 .body(new ParameterizedTypeReference<List<TextChannelDto>>() {});
+    }
+
+    public Map<String, Object> getActionsConfig(String guildId) {
+        return botRestClient.get()
+                .uri("/internal/guilds/{guildId}/actions", guildId)
+                .retrieve()
+                .body(new ParameterizedTypeReference<Map<String, Object>>() {});
+    }
+
+    public void saveActionsConfig(String guildId, ActionsConfigRequest request) {
+        botRestClient.put()
+                .uri("/internal/guilds/{guildId}/actions", guildId)
+                .body(Map.of("enabled", request.isEnabled()))
+                .retrieve()
+                .toBodilessEntity();
     }
 
     public String syncReactionPanel(String guildId, SyncReactionPanelRequest request) {
