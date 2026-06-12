@@ -1,6 +1,7 @@
 package com.kat.backend.guild.service;
 
 import com.kat.backend.guild.dto.ActionsConfigRequest;
+import com.kat.backend.leveling.dto.LevelingConfigRequest;
 import com.kat.backend.guild.dto.RoleDto;
 import com.kat.backend.guild.dto.SyncReactionPanelRequest;
 import com.kat.backend.guild.dto.TextChannelDto;
@@ -72,5 +73,20 @@ public class BotGuildService {
                 .body(new ParameterizedTypeReference<Map<String, String>>() {});
 
         return response != null ? response.get("messageId") : null;
+    }
+
+    public Map<String, Object> getLevelingConfig(String guildId) {
+        return botRestClient.get()
+                .uri("/internal/guilds/{guildId}/leveling", guildId)
+                .retrieve()
+                .body(new ParameterizedTypeReference<Map<String, Object>>() {});
+    }
+
+    public void saveLevelingConfig(String guildId, LevelingConfigRequest request) {
+        botRestClient.put()
+                .uri("/internal/guilds/{guildId}/leveling", guildId)
+                .body(Map.of("enabled", request.isEnabled()))
+                .retrieve()
+                .toBodilessEntity();
     }
 }
