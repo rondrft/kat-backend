@@ -6,6 +6,7 @@ import com.kat.backend.booster.dto.BoosterCustomRoleResponse;
 import com.kat.backend.booster.service.BoosterService;
 import com.kat.backend.common.ApiResponse;
 import com.kat.backend.security.GuildAdmin;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,6 +43,7 @@ public class BoosterController {
     }
 
     @GetMapping("/settings")
+    @GuildAdmin
     public ResponseEntity<ApiResponse<BoosterConfigResponse>> getSettings(
             @PathVariable String guildId) {
 
@@ -53,7 +55,7 @@ public class BoosterController {
     @GuildAdmin
     public ResponseEntity<ApiResponse<BoosterConfigResponse>> updateSettings(
             @PathVariable String guildId,
-            @RequestBody BoosterConfigRequest request) {
+            @Valid @RequestBody BoosterConfigRequest request) {
 
         BoosterConfigResponse response = boosterService.updateSettings(guildId, request);
         return ResponseEntity.ok(ApiResponse.ok(response));

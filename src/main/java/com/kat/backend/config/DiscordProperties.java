@@ -1,19 +1,28 @@
 package com.kat.backend.config;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 
 @Getter
 @Setter
+@Validated
 @Component
 @ConfigurationProperties(prefix = "discord")
 public class DiscordProperties {
 
+    @NotBlank
     private String clientId;
+
+    @NotBlank
     private String clientSecret;
+
+    @NotBlank
     private String redirectUri;
-    /** Bot token — required for GUILD_MEMBER_JOIN events (dashboard chart + avatars). */
+
+    @NotBlank
     private String botToken;
 }

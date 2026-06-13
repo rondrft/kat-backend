@@ -21,7 +21,18 @@ public class RateLimitConfig implements WebMvcConfigurer {
                         "/guilds/*/welcomes/**",
                         "/guilds/*/autoroles/**",
                         "/guilds/*/voice/**",
-                        "/guilds/*/moderation/**"
+                        "/guilds/*/moderation/**",
+                        "/guilds/*/leveling/**",
+                        "/guilds/*/logging/**",
+                        "/guilds/*/actions/**",
+                        "/guilds/*/premium/**",
+                        "/guilds/*/audit-logs/**",
+                        "/guilds/*/ranking/**",
+                        "/guilds/*/members/**",
+                        "/guilds/*/channels/**",
+                        "/guilds/*/roles/**",
+                        "/guilds/*/stats",
+                        "/owner/**"
                 );
     }
 }

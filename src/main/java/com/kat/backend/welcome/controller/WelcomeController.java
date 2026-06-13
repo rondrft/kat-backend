@@ -23,6 +23,7 @@ public class WelcomeController {
     private final WelcomeService welcomeService;
 
     @GetMapping
+    @GuildAdmin
     public ResponseEntity<ApiResponse<WelcomeConfigDto>> getConfig(
             @PathVariable String guildId,
             @AuthenticationPrincipal String discordId) {

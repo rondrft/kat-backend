@@ -4,7 +4,7 @@ import com.kat.backend.discord.DiscordUserResponse;
 import com.kat.backend.user.dto.UserResponse;
 import com.kat.backend.user.entity.User;
 import com.kat.backend.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

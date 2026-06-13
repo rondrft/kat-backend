@@ -24,6 +24,7 @@ public class ModerationController {
     private final ModerationLogService moderationLogService;
 
     @GetMapping
+    @GuildAdmin
     public ResponseEntity<ApiResponse<ModerationConfigDto>> getConfig(
             @PathVariable String guildId) {
         return ResponseEntity.ok(ApiResponse.ok(moderationService.getConfig(guildId)));
@@ -38,6 +39,7 @@ public class ModerationController {
     }
 
     @GetMapping("/logs")
+    @GuildAdmin
     public ResponseEntity<ApiResponse<ModerationLogPageDto>> getLogs(
             @PathVariable String guildId,
             @RequestParam(defaultValue = "0") int page,
@@ -46,6 +48,7 @@ public class ModerationController {
     }
 
     @GetMapping("/permissions")
+    @GuildAdmin
     public ResponseEntity<ApiResponse<ModPermissionDto>> getPermissions(
             @PathVariable String guildId,
             @AuthenticationPrincipal String discordId) {
@@ -57,11 +60,12 @@ public class ModerationController {
     public ResponseEntity<ApiResponse<ModPermissionDto>> savePermissions(
             @PathVariable String guildId,
             @AuthenticationPrincipal String discordId,
-            @RequestBody ModPermissionDto dto) {
+            @Valid @RequestBody ModPermissionDto dto) {
         return ResponseEntity.ok(ApiResponse.ok(moderationService.savePermissions(guildId, dto)));
     }
 
     @GetMapping("/purge")
+    @GuildAdmin
     public ResponseEntity<ApiResponse<PurgeConfigDto>> getPurgeConfig(
             @PathVariable String guildId,
             @AuthenticationPrincipal String discordId) {
@@ -73,11 +77,12 @@ public class ModerationController {
     public ResponseEntity<ApiResponse<PurgeConfigDto>> savePurgeConfig(
             @PathVariable String guildId,
             @AuthenticationPrincipal String discordId,
-            @RequestBody PurgeConfigDto dto) {
+            @Valid @RequestBody PurgeConfigDto dto) {
         return ResponseEntity.ok(ApiResponse.ok(moderationService.savePurgeConfig(guildId, dto)));
     }
 
     @GetMapping("/nuke")
+    @GuildAdmin
     public ResponseEntity<ApiResponse<NukeConfigDto>> getNukeConfig(
             @PathVariable String guildId,
             @AuthenticationPrincipal String discordId) {
@@ -89,7 +94,7 @@ public class ModerationController {
     public ResponseEntity<ApiResponse<NukeConfigDto>> saveNukeConfig(
             @PathVariable String guildId,
             @AuthenticationPrincipal String discordId,
-            @RequestBody NukeConfigDto dto) {
+            @Valid @RequestBody NukeConfigDto dto) {
         return ResponseEntity.ok(ApiResponse.ok(moderationService.saveNukeConfig(guildId, dto)));
     }
 }

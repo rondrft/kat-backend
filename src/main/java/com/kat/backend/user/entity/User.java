@@ -1,5 +1,6 @@
 package com.kat.backend.user.entity;
 
+import com.kat.backend.common.AttributeEncryptor;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +25,7 @@ public class User {
     @Column(name = "discord_id", unique = true, nullable = false)
     private String discordId;
 
+    @Convert(converter = AttributeEncryptor.class)
     @Column(name = "discord_access_token")
     private String discordAccessToken;
 

@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
 
 import java.util.Map;
@@ -28,6 +29,7 @@ public class GuildStatsService {
     private final WelcomeConfigRepository welcomeConfigRepository;
     private final GuildTempVoiceConfigRepository tempVoiceConfigRepository;
 
+    @Transactional(readOnly = true)
     public GuildStatsDto getStats(String guildId) {
         Map<String, Object> botStats = botRestClient.get()
                 .uri("/internal/guilds/{guildId}/stats", guildId)

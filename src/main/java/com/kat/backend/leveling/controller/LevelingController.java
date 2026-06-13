@@ -5,6 +5,7 @@ import com.kat.backend.guild.service.BotGuildService;
 import com.kat.backend.leveling.dto.LevelingConfigRequest;
 import com.kat.backend.leveling.dto.LevelingConfigResponse;
 import com.kat.backend.security.GuildAdmin;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,6 +26,7 @@ public class LevelingController {
     private final BotGuildService botGuildService;
 
     @GetMapping
+    @GuildAdmin
     public ResponseEntity<ApiResponse<LevelingConfigResponse>> getConfig(
             @PathVariable String guildId) {
 
@@ -41,7 +43,7 @@ public class LevelingController {
     @GuildAdmin
     public ResponseEntity<ApiResponse<Void>> saveConfig(
             @PathVariable String guildId,
-            @RequestBody LevelingConfigRequest request,
+            @Valid @RequestBody LevelingConfigRequest request,
             @AuthenticationPrincipal String discordId) {
 
         botGuildService.saveLevelingConfig(guildId, request);

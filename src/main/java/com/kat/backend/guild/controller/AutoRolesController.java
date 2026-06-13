@@ -5,6 +5,7 @@ import com.kat.backend.guild.dto.AutoRolesConfigRequest;
 import com.kat.backend.guild.dto.AutoRolesConfigResponse;
 import com.kat.backend.guild.service.AutoRolesService;
 import com.kat.backend.security.GuildAdmin;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,6 +19,7 @@ public class AutoRolesController {
     private final AutoRolesService autoRolesService;
 
     @GetMapping
+    @GuildAdmin
     public ResponseEntity<ApiResponse<AutoRolesConfigResponse>> getConfig(
             @PathVariable String guildId) {
 
@@ -30,7 +32,7 @@ public class AutoRolesController {
     @GuildAdmin
     public ResponseEntity<ApiResponse<AutoRolesConfigResponse>> saveConfig(
             @PathVariable String guildId,
-            @RequestBody AutoRolesConfigRequest request,
+            @Valid @RequestBody AutoRolesConfigRequest request,
             @AuthenticationPrincipal String discordId) {
 
         return ResponseEntity.ok(

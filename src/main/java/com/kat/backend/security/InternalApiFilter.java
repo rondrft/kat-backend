@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.util.Base64;
 
 @Component
 public class InternalApiFilter extends OncePerRequestFilter {
@@ -24,7 +26,8 @@ public class InternalApiFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String apiKey = request.getHeader("X-Internal-Api-Key");
-        if (!expectedApiKey.equals(apiKey)) {
+        if (apiKey == null || !MessageDigest.isEqual(
+                expectedApiKey.getBytes(), apiKey.getBytes())) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.setContentType("application/json");
             response.getWriter().write("{\"success\":false,\"message\":\"Invalid internal API key\"}");

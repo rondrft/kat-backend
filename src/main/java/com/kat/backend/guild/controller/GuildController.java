@@ -6,6 +6,8 @@ import com.kat.backend.guild.dto.*;
 import com.kat.backend.guild.service.BotGuildService;
 import com.kat.backend.guild.service.GuildService;
 import com.kat.backend.guild.service.GuildStatsService;
+import com.kat.backend.security.GuildAdmin;
+import jakarta.validation.constraints.Max;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -43,7 +45,7 @@ public class GuildController {
     @GetMapping("/{guildId}/members/recent")
     public ResponseEntity<ApiResponse<List<RecentMemberDto>>> getRecentMembers(
             @PathVariable String guildId,
-            @RequestParam(defaultValue = "12") int limit,
+            @Max(100) @RequestParam(defaultValue = "12") int limit,
             @AuthenticationPrincipal String discordId) {
 
         List<RecentMemberDto> members = guildService.getRecentMembers(guildId, limit);
@@ -53,7 +55,7 @@ public class GuildController {
     @GetMapping("/{guildId}/members/stats")
     public ResponseEntity<ApiResponse<List<MemberJoinStatDto>>> getMemberJoinStats(
             @PathVariable String guildId,
-            @RequestParam(defaultValue = "30") int days,
+            @Max(365) @RequestParam(defaultValue = "30") int days,
             @AuthenticationPrincipal String discordId) {
 
         List<MemberJoinStatDto> stats = guildService.getMemberJoinStats(guildId, days);
@@ -61,6 +63,7 @@ public class GuildController {
     }
 
     @GetMapping("/{guildId}/channels/categories")
+    @GuildAdmin
     public ResponseEntity<ApiResponse<List<Map<String, String>>>> getCategories(
             @PathVariable String guildId,
             @AuthenticationPrincipal String discordId) {
@@ -70,6 +73,7 @@ public class GuildController {
     }
 
     @GetMapping("/{guildId}/roles")
+    @GuildAdmin
     public ResponseEntity<ApiResponse<List<RoleDto>>> getRoles(
             @PathVariable String guildId) {
 
@@ -79,6 +83,7 @@ public class GuildController {
     }
 
     @GetMapping("/{guildId}/channels/text")
+    @GuildAdmin
     public ResponseEntity<ApiResponse<List<TextChannelDto>>> getTextChannels(
             @PathVariable String guildId) {
 

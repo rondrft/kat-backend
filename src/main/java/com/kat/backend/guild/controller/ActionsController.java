@@ -5,6 +5,7 @@ import com.kat.backend.guild.dto.ActionsConfigRequest;
 import com.kat.backend.guild.dto.ActionsConfigResponse;
 import com.kat.backend.guild.service.BotGuildService;
 import com.kat.backend.security.GuildAdmin;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,6 +21,7 @@ public class ActionsController {
     private final BotGuildService botGuildService;
 
     @GetMapping
+    @GuildAdmin
     public ResponseEntity<ApiResponse<ActionsConfigResponse>> getConfig(
             @PathVariable String guildId) {
 
@@ -36,7 +38,7 @@ public class ActionsController {
     @GuildAdmin
     public ResponseEntity<ApiResponse<Void>> saveConfig(
             @PathVariable String guildId,
-            @RequestBody ActionsConfigRequest request,
+            @Valid @RequestBody ActionsConfigRequest request,
             @AuthenticationPrincipal String discordId) {
 
         botGuildService.saveActionsConfig(guildId, request);

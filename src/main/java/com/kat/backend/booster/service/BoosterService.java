@@ -56,7 +56,7 @@ public class BoosterService {
                         .build());
     }
 
-    @CacheEvict(value = {"boosterSettings", "boosterCustomRoles"}, allEntries = true)
+    @CacheEvict(value = {"boosterSettings", "boosterCustomRoles"}, key = "#guildId")
     public BoosterConfigResponse updateSettings(String guildId, BoosterConfigRequest request) {
         BoosterConfig config = boosterConfigRepository.findById(guildId)
                 .orElse(BoosterConfig.builder().guildId(guildId).build());
