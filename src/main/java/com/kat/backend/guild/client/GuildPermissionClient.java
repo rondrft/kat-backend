@@ -1,11 +1,13 @@
 package com.kat.backend.guild.client;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.util.Map;
 
+@Slf4j
 @Component
 public class GuildPermissionClient {
 
@@ -29,8 +31,13 @@ public class GuildPermissionClient {
                     .retrieve()
                     .body(Map.class);
 
-            return response != null && Boolean.TRUE.equals(response.get("admin"));
+            boolean admin = response != null && Boolean.TRUE.equals(response.get("admin"));
+            if (!admin) {
+                log.warn("Bot returned admin=false for user {} in guild {}", discordId, guildId);
+            }
+            return admin;
         } catch (Exception e) {
+            log.warn("Failed to check admin status for user {} in guild {}: {}", discordId, guildId, e.getMessage());
             return false;
         }
     }

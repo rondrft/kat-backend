@@ -5,6 +5,12 @@ import com.kat.backend.leveling.dto.LevelingConfigRequest;
 import com.kat.backend.guild.dto.RoleDto;
 import com.kat.backend.guild.dto.SyncReactionPanelRequest;
 import com.kat.backend.guild.dto.TextChannelDto;
+import com.kat.backend.giveaway.dto.CreateGiveawayRequest;
+import com.kat.backend.giveaway.dto.GiveawayParticipantDto;
+import com.kat.backend.giveaway.dto.GiveawayResponse;
+import com.kat.backend.giveaway.dto.RollGiveawayResponse;
+import com.kat.backend.message.dto.SendMessageRequest;
+import com.kat.backend.message.dto.SendMessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
@@ -88,5 +94,42 @@ public class BotGuildService {
                 .body(Map.of("enabled", request.isEnabled()))
                 .retrieve()
                 .toBodilessEntity();
+    }
+
+    public SendMessageResponse sendMessage(String guildId, SendMessageRequest request) {
+        return botRestClient.post()
+                .uri("/internal/guilds/{guildId}/messages/send", guildId)
+                .body(request)
+                .retrieve()
+                .body(SendMessageResponse.class);
+    }
+
+    public GiveawayResponse createGiveaway(String guildId, CreateGiveawayRequest request) {
+        return botRestClient.post()
+                .uri("/internal/guilds/{guildId}/giveaways", guildId)
+                .body(request)
+                .retrieve()
+                .body(GiveawayResponse.class);
+    }
+
+    public GiveawayResponse getGiveaway(String guildId, String giveawayId) {
+        return botRestClient.get()
+                .uri("/internal/guilds/{guildId}/giveaways/{giveawayId}", guildId, giveawayId)
+                .retrieve()
+                .body(GiveawayResponse.class);
+    }
+
+    public List<GiveawayParticipantDto> getGiveawayParticipants(String guildId, String giveawayId) {
+        return botRestClient.get()
+                .uri("/internal/guilds/{guildId}/giveaways/{giveawayId}/participants", guildId, giveawayId)
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<GiveawayParticipantDto>>() {});
+    }
+
+    public RollGiveawayResponse rollGiveaway(String guildId, String giveawayId) {
+        return botRestClient.post()
+                .uri("/internal/guilds/{guildId}/giveaways/{giveawayId}/roll", guildId, giveawayId)
+                .retrieve()
+                .body(RollGiveawayResponse.class);
     }
 }

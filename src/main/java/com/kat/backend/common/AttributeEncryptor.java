@@ -60,7 +60,7 @@ public class AttributeEncryptor implements AttributeConverter<String, String> {
             cipher.init(Cipher.DECRYPT_MODE, secretKey, spec);
             return new String(cipher.doFinal(encrypted));
         } catch (Exception e) {
-            throw new RuntimeException("Failed to decrypt attribute", e);
+            return dbData;
         }
     }
 }
