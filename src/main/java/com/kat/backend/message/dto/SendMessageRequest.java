@@ -1,5 +1,6 @@
 package com.kat.backend.message.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
@@ -17,7 +18,9 @@ public class SendMessageRequest {
     @NotBlank(message = "Channel ID is required")
     private String channelId;
 
+    @Valid
     private MessageContentDto messageContent;
 
+    @Valid
     private EmbedContentDto embedContent;
 }

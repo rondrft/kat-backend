@@ -21,6 +21,7 @@ public class GiveawayResponse {
     private Instant endTime;
     private int winnerCount;
     private boolean boosterOnly;
+    private long participantCount;
     private Set<String> participantIds;
     private List<String> winnerIds;
     private boolean ended;
