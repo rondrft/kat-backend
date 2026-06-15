@@ -1,7 +1,6 @@
 package com.kat.backend.guild.controller;
 
 import com.kat.backend.common.ApiResponse;
-import com.kat.backend.discord.DiscordGuildResponse;
 import com.kat.backend.guild.dto.*;
 import com.kat.backend.guild.service.BotGuildService;
 import com.kat.backend.guild.service.GuildService;
@@ -26,10 +25,10 @@ public class GuildController {
     private final GuildStatsService  guildStatsService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<DiscordGuildResponse>>> getUserGuilds(
+    public ResponseEntity<ApiResponse<List<GuildUserResponse>>> getUserGuilds(
             @AuthenticationPrincipal String discordId) {
 
-        List<DiscordGuildResponse> guilds = guildService.getUserGuilds(discordId);
+        List<GuildUserResponse> guilds = guildService.getUserGuilds(discordId);
         return ResponseEntity.ok(ApiResponse.ok(guilds));
     }
 

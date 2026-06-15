@@ -3,6 +3,7 @@ package com.kat.backend.guild.service;
 import com.kat.backend.discord.DiscordClient;
 import com.kat.backend.discord.DiscordGuildResponse;
 import com.kat.backend.guild.dto.DailyJoinDto;
+import com.kat.backend.guild.dto.GuildUserResponse;
 import com.kat.backend.guild.dto.MemberJoinStatDto;
 import com.kat.backend.guild.dto.MonthlyJoinStatsDto;
 import com.kat.backend.guild.dto.RecentMemberDto;
@@ -10,22 +11,31 @@ import com.kat.backend.guild.repository.GuildMemberRepository;
 import com.kat.backend.user.entity.User;
 import com.kat.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class GuildService {
 
+    private static final long ADMINISTRATOR_PERMISSION = 0x8;
+
     private final DiscordClient discordClient;
     private final UserRepository userRepository;
     private final GuildMemberRepository guildMemberRepository;
+
+    @Qualifier("botRestClient")
+    private final RestClient botRestClient;
 
     public MonthlyJoinStatsDto getMonthlyJoinStats(String guildId) {
         LocalDate today = LocalDate.now();
@@ -101,11 +111,47 @@ public class GuildService {
                 .toList();
     }
 
-    public List<DiscordGuildResponse> getUserGuilds(String discordId) {
+    public List<GuildUserResponse> getUserGuilds(String discordId) {
         User user = userRepository.findByDiscordId(discordId)
                 .orElseThrow(() -> new RuntimeException("User not found: " + discordId));
 
-        return discordClient.getUserGuilds(user.getDiscordAccessToken());
+        List<DiscordGuildResponse> rawGuilds = discordClient.getUserGuilds(user.getDiscordAccessToken());
+
+        Set<String> botGuildIds = fetchBotGuildIds();
+
+        return rawGuilds.stream()
+                .map(g -> GuildUserResponse.builder()
+                        .id(g.getId())
+                        .name(g.getName())
+                        .icon(g.getIcon())
+                        .owner(g.isOwner())
+                        .permissions(g.getPermissions())
+                        .botJoined(botGuildIds.contains(g.getId()))
+                        .canManage(canManageGuild(g.getPermissions()))
+                        .build())
+                .toList();
+    }
+
+    private Set<String> fetchBotGuildIds() {
+        try {
+            List<String> ids = botRestClient.get()
+                    .uri("/internal/guilds/ids")
+                    .retrieve()
+                    .body(new ParameterizedTypeReference<List<String>>() {});
+            return ids != null ? Set.copyOf(ids) : Set.of();
+        } catch (Exception e) {
+            return Set.of();
+        }
+    }
+
+    private boolean canManageGuild(String permissions) {
+        if (permissions == null || permissions.isBlank()) return false;
+        try {
+            long perms = Long.parseUnsignedLong(permissions);
+            return (perms & ADMINISTRATOR_PERMISSION) != 0;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     public List<MemberJoinStatDto> getMemberJoinStats(String guildId, int days) {
