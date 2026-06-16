@@ -2,6 +2,7 @@ package com.kat.backend.guild.service;
 
 import com.kat.backend.guild.dto.ActionsConfigRequest;
 import com.kat.backend.leveling.dto.LevelingConfigRequest;
+import com.kat.backend.works.dto.WorkConfigRequest;
 import com.kat.backend.guild.dto.RoleDto;
 import com.kat.backend.guild.dto.SyncReactionPanelRequest;
 import com.kat.backend.guild.dto.TextChannelDto;
@@ -124,6 +125,21 @@ public class BotGuildService {
                 .uri("/internal/guilds/{guildId}/giveaways/{giveawayId}/participants", guildId, giveawayId)
                 .retrieve()
                 .body(new ParameterizedTypeReference<List<GiveawayParticipantDto>>() {});
+    }
+
+    public Map<String, Object> getWorkConfig(String guildId) {
+        return botRestClient.get()
+                .uri("/internal/guilds/{guildId}/works", guildId)
+                .retrieve()
+                .body(new ParameterizedTypeReference<Map<String, Object>>() {});
+    }
+
+    public Map<String, Object> saveWorkConfig(String guildId, WorkConfigRequest request) {
+        return botRestClient.put()
+                .uri("/internal/guilds/{guildId}/works", guildId)
+                .body(Map.of("enabled", request.isEnabled()))
+                .retrieve()
+                .body(new ParameterizedTypeReference<Map<String, Object>>() {});
     }
 
     public RollGiveawayResponse rollGiveaway(String guildId, String giveawayId) {

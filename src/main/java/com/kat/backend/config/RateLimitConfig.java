@@ -26,6 +26,7 @@ public class RateLimitConfig implements WebMvcConfigurer {
                         "/guilds/*/logging/**",
                         "/guilds/*/actions/**",
                         "/guilds/*/giveaways/**",
+                        "/guilds/*/works/**",
                         "/guilds/*/messages/**",
                         "/guilds/*/premium/**",
                         "/guilds/*/audit-logs/**",
