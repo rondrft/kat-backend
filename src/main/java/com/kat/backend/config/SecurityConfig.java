@@ -34,6 +34,7 @@ public class SecurityConfig {
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/internal/**").permitAll()
                         .requestMatchers("/health").permitAll()
+                        .requestMatchers("/actuator/health", "/actuator/info", "/actuator/metrics/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(internalApiFilter, UsernamePasswordAuthenticationFilter.class)

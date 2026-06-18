@@ -5,12 +5,12 @@ import com.kat.backend.audit.dto.AuditLogDto;
 import com.kat.backend.audit.dto.RankingEntryDto;
 import com.kat.backend.common.ApiResponse;
 import com.kat.backend.security.GuildAdmin;
-import jakarta.validation.constraints.Max;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/guilds/{guildId}")
@@ -21,19 +21,19 @@ public class AuditController {
 
     @GetMapping("/audit-logs")
     @GuildAdmin
-    public ResponseEntity<ApiResponse<List<AuditLogDto>>> getAuditLogs(
+    public ResponseEntity<ApiResponse<Page<AuditLogDto>>> getAuditLogs(
             @PathVariable String guildId,
-            @Max(200) @RequestParam(defaultValue = "50") int limit) {
-        List<AuditLogDto> logs = auditBotClient.getAuditLogs(guildId, limit);
+            @PageableDefault(size = 50) Pageable pageable) {
+        Page<AuditLogDto> logs = auditBotClient.getAuditLogs(guildId, pageable);
         return ResponseEntity.ok(ApiResponse.ok(logs));
     }
 
     @GetMapping("/ranking")
     @GuildAdmin
-    public ResponseEntity<ApiResponse<List<RankingEntryDto>>> getRanking(
+    public ResponseEntity<ApiResponse<Page<RankingEntryDto>>> getRanking(
             @PathVariable String guildId,
-            @Max(200) @RequestParam(defaultValue = "50") int limit) {
-        List<RankingEntryDto> ranking = auditBotClient.getRanking(guildId, limit);
+            @PageableDefault(size = 50) Pageable pageable) {
+        Page<RankingEntryDto> ranking = auditBotClient.getRanking(guildId, pageable);
         return ResponseEntity.ok(ApiResponse.ok(ranking));
     }
 }

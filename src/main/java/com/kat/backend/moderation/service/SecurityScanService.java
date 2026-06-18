@@ -8,6 +8,8 @@ import com.kat.backend.guild.service.GuildService;
 import com.kat.backend.moderation.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -43,8 +45,8 @@ public class SecurityScanService {
         log.info("Starting security scan for guild {}", guildId);
 
         List<RoleDto> roles = safeList(botGuildService.getSecurityScanRoles(guildId));
-        List<TextChannelDto> channels = safeList(botGuildService.getTextChannels(guildId));
-        List<RecentMemberDto> recentMembers = safeList(guildService.getRecentMembers(guildId, RECENT_MEMBER_LIMIT));
+        List<TextChannelDto> channels = safeList(botGuildService.getTextChannels(guildId, Pageable.unpaged()).getContent());
+        List<RecentMemberDto> recentMembers = safeList(guildService.getRecentMembers(guildId, PageRequest.of(0, RECENT_MEMBER_LIMIT)).getContent());
         ModerationConfigDto config = safeConfig(guildId);
 
         List<SecurityScanFindingDto> findings = new ArrayList<>();

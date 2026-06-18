@@ -36,4 +36,14 @@ public class TempVoiceController {
 
         return ResponseEntity.ok(ApiResponse.ok(tempVoiceService.saveConfig(guildId, request)));
     }
+
+    @DeleteMapping("/channels")
+    @GuildAdmin
+    public ResponseEntity<ApiResponse<Void>> deleteAllChannels(
+            @PathVariable String guildId,
+            @AuthenticationPrincipal String discordId) {
+
+        tempVoiceService.deleteAllChannels(guildId);
+        return ResponseEntity.ok(ApiResponse.ok(null));
+    }
 }

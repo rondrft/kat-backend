@@ -20,7 +20,7 @@ public class ModerationLogCleanupService {
 
     private final ModerationLogRepository repository;
 
-    @Scheduled(cron = "0 0 3 * * *") // every day at 3am UTC
+    @Scheduled(cron = "0 0 3 * * *")
     @Transactional
     public void cleanOldLogs() {
         Instant cutoff = Instant.now().minus(RETENTION_DAYS, ChronoUnit.DAYS);

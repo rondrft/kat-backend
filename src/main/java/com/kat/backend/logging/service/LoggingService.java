@@ -8,6 +8,8 @@ import com.kat.backend.logging.entity.LoggingEntry;
 import com.kat.backend.logging.repository.LoggingConfigRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,13 +25,15 @@ public class LoggingService {
     private final LoggingBotClient botClient;
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "loggingConfigs", key = "#guildId", unless = "#result == null")
     public Optional<LoggingConfigDto> getConfig(String guildId) {
-        return repository.findById(guildId).map(this::toDto);
+        return repository.findWithEntriesByGuildId(guildId).map(this::toDto);
     }
 
     @Transactional
+    @CacheEvict(value = "loggingConfigs", key = "#guildId")
     public LoggingConfigDto saveConfig(String guildId, LoggingConfigDto dto) {
-        LoggingConfig config = repository.findById(guildId)
+        LoggingConfig config = repository.findWithEntriesByGuildId(guildId)
                 .orElseGet(() -> LoggingConfig.builder().guildId(guildId).build());
 
         config.setDefaultChannel(dto.getDefaultChannel());

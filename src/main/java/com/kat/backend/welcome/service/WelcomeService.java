@@ -28,9 +28,9 @@ public class WelcomeService {
     );
 
     private static final List<byte[]> MAGIC_BYTES = List.of(
-            new byte[]{(byte) 0x89, 0x50, 0x4E, 0x47},           // PNG
-            new byte[]{(byte) 0xFF, (byte) 0xD8, (byte) 0xFF},   // JPEG
-            new byte[]{0x52, 0x49, 0x46, 0x46}                   // WEBP (RIFF)
+            new byte[]{(byte) 0x89, 0x50, 0x4E, 0x47},
+            new byte[]{(byte) 0xFF, (byte) 0xD8, (byte) 0xFF},
+            new byte[]{0x52, 0x49, 0x46, 0x46}
     );
 
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;

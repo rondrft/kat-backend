@@ -10,7 +10,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.security.MessageDigest;
-import java.util.Base64;
 
 @Component
 public class InternalApiFilter extends OncePerRequestFilter {

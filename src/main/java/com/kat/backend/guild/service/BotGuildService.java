@@ -15,6 +15,9 @@ import com.kat.backend.message.dto.SendMessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -28,11 +31,12 @@ public class BotGuildService {
     @Qualifier("botRestClient")
     private final RestClient botRestClient;
 
-    public List<Map<String, String>> getCategories(String guildId) {
-        return botRestClient.get()
+    public Page<Map<String, String>> getCategories(String guildId, Pageable pageable) {
+        List<Map<String, String>> categories = botRestClient.get()
                 .uri("/internal/guilds/{guildId}/categories", guildId)
                 .retrieve()
                 .body(new ParameterizedTypeReference<List<Map<String, String>>>() {});
+        return paginateList(categories, pageable);
     }
 
     public Map<String, String> provisionVoice(String guildId, Map<String, Object> config) {
@@ -43,18 +47,27 @@ public class BotGuildService {
                 .body(new ParameterizedTypeReference<Map<String, String>>() {});
     }
 
-    public List<RoleDto> getRoles(String guildId) {
-        return botRestClient.get()
+    public void deleteAllTempVoiceChannels(String guildId) {
+        botRestClient.delete()
+                .uri("/internal/guilds/{guildId}/voice/temp/channels", guildId)
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+    public Page<RoleDto> getRoles(String guildId, Pageable pageable) {
+        List<RoleDto> roles = botRestClient.get()
                 .uri("/internal/guilds/{guildId}/roles", guildId)
                 .retrieve()
                 .body(new ParameterizedTypeReference<List<RoleDto>>() {});
+        return paginateList(roles, pageable);
     }
 
-    public List<TextChannelDto> getTextChannels(String guildId) {
-        return botRestClient.get()
+    public Page<TextChannelDto> getTextChannels(String guildId, Pageable pageable) {
+        List<TextChannelDto> channels = botRestClient.get()
                 .uri("/internal/guilds/{guildId}/channels/text", guildId)
                 .retrieve()
                 .body(new ParameterizedTypeReference<List<TextChannelDto>>() {});
+        return paginateList(channels, pageable);
     }
 
     public Map<String, Object> getActionsConfig(String guildId) {
@@ -120,11 +133,12 @@ public class BotGuildService {
                 .body(GiveawayResponse.class);
     }
 
-    public List<GiveawayParticipantDto> getGiveawayParticipants(String guildId, String giveawayId) {
-        return botRestClient.get()
+    public Page<GiveawayParticipantDto> getGiveawayParticipants(String guildId, String giveawayId, Pageable pageable) {
+        List<GiveawayParticipantDto> participants = botRestClient.get()
                 .uri("/internal/guilds/{guildId}/giveaways/{giveawayId}/participants", guildId, giveawayId)
                 .retrieve()
                 .body(new ParameterizedTypeReference<List<GiveawayParticipantDto>>() {});
+        return paginateList(participants, pageable);
     }
 
     public Map<String, Object> getWorkConfig(String guildId) {
@@ -147,5 +161,24 @@ public class BotGuildService {
                 .uri("/internal/guilds/{guildId}/giveaways/{giveawayId}/roll", guildId, giveawayId)
                 .retrieve()
                 .body(RollGiveawayResponse.class);
+    }
+
+    public List<RoleDto> getSecurityScanRoles(String guildId) {
+        return botRestClient.get()
+                .uri("/internal/guilds/{guildId}/security-scan/roles", guildId)
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<RoleDto>>() {});
+    }
+
+    private <T> Page<T> paginateList(List<T> list, Pageable pageable) {
+        if (list == null || list.isEmpty()) {
+            return Page.empty();
+        }
+        if (pageable.isUnpaged()) {
+            return new PageImpl<>(list, pageable, list.size());
+        }
+        int start = Math.min((int) pageable.getOffset(), list.size());
+        int end = Math.min(start + pageable.getPageSize(), list.size());
+        return new PageImpl<>(list.subList(start, end), pageable, list.size());
     }
 }

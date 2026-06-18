@@ -13,6 +13,9 @@ import com.kat.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -66,9 +69,8 @@ public class GuildService {
                 .build();
     }
 
-    public List<RecentMemberDto> getRecentMembers(String guildId, int limit) {
-        return guildMemberRepository.findRecentByGuildId(guildId, limit)
-                .stream()
+    public Page<RecentMemberDto> getRecentMembers(String guildId, Pageable pageable) {
+        return guildMemberRepository.findRecentByGuildId(guildId, pageable)
                 .map(m -> {
                     List<String> reasons = new ArrayList<>();
                     String level;
@@ -107,11 +109,10 @@ public class GuildService {
                             .alertLevel(level)
                             .alertReasons(reasons)
                             .build();
-                })
-                .toList();
+                });
     }
 
-    public List<GuildUserResponse> getUserGuilds(String discordId) {
+    public Page<GuildUserResponse> getUserGuilds(String discordId, Pageable pageable) {
         User user = userRepository.findByDiscordId(discordId)
                 .orElseThrow(() -> new RuntimeException("User not found: " + discordId));
 
@@ -119,7 +120,7 @@ public class GuildService {
 
         Set<String> botGuildIds = fetchBotGuildIds();
 
-        return rawGuilds.stream()
+        List<GuildUserResponse> allGuilds = rawGuilds.stream()
                 .map(g -> GuildUserResponse.builder()
                         .id(g.getId())
                         .name(g.getName())
@@ -130,6 +131,20 @@ public class GuildService {
                         .canManage(canManageGuild(g.getPermissions()))
                         .build())
                 .toList();
+
+        return paginateList(allGuilds, pageable);
+    }
+
+    private <T> Page<T> paginateList(List<T> list, Pageable pageable) {
+        if (list == null || list.isEmpty()) {
+            return Page.empty();
+        }
+        if (pageable.isUnpaged()) {
+            return new PageImpl<>(list, pageable, list.size());
+        }
+        int start = Math.min((int) pageable.getOffset(), list.size());
+        int end = Math.min(start + pageable.getPageSize(), list.size());
+        return new PageImpl<>(list.subList(start, end), pageable, list.size());
     }
 
     private Set<String> fetchBotGuildIds() {

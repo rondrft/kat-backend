@@ -9,6 +9,8 @@ import com.kat.backend.guild.service.BotGuildService;
 import com.kat.backend.security.GuildAdmin;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,10 +52,10 @@ public class GiveawayController {
     @GuildAdmin
     public ResponseEntity<ApiResponse<List<GiveawayParticipantDto>>> getParticipants(
             @PathVariable String guildId,
-            @PathVariable String giveawayId) {
+            @PathVariable String giveawayId,
+            @PageableDefault(size = 50) Pageable pageable) {
 
-        List<GiveawayParticipantDto> response = botGuildService.getGiveawayParticipants(guildId, giveawayId);
-        return ResponseEntity.ok(ApiResponse.ok(response));
+        return ResponseEntity.ok(ApiResponse.ok(botGuildService.getGiveawayParticipants(guildId, giveawayId, pageable).getContent()));
     }
 
     @PostMapping("/{giveawayId}/roll")

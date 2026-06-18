@@ -16,7 +16,7 @@ public class GuildAutoRolesConfig {
     @Id
     private String guildId;
 
-    // --- On Join ---
+
     private boolean joinEnabled = false;
 
     @ElementCollection
@@ -27,7 +27,7 @@ public class GuildAutoRolesConfig {
     @Column(name = "role_id")
     private List<String> joinRoleIds = new ArrayList<>();
 
-    // --- On Boost ---
+
     private boolean boostEnabled = false;
 
     @ElementCollection
@@ -38,7 +38,7 @@ public class GuildAutoRolesConfig {
     @Column(name = "role_id")
     private List<String> boostRoleIds = new ArrayList<>();
 
-    // --- Reaction Roles ---
+
     private boolean reactionEnabled = false;
     private String reactionChannelId;
     private String reactionMessageContent;

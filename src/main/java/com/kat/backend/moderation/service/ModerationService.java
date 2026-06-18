@@ -10,6 +10,8 @@ import com.kat.backend.moderation.mapper.ModerationConfigMapper;
 import com.kat.backend.moderation.repository.ModerationConfigRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,15 +27,17 @@ public class ModerationService {
     private final ModerationBotClient moderationBotClient;
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "moderationConfigs", key = "#guildId", unless = "#result == null")
     public ModerationConfigDto getConfig(String guildId) {
-        return repository.findById(guildId)
+        return repository.findWithRulesByGuildId(guildId)
                 .map(mapper::toDto)
                 .orElseGet(() -> mapper.defaultDto(guildId));
     }
 
     @Transactional
+    @CacheEvict(value = "moderationConfigs", key = "#guildId")
     public ModerationConfigDto saveConfig(String guildId, ModerationConfigDto dto) {
-        ModerationConfig entity = repository.findById(guildId).orElseGet(() ->
+        ModerationConfig entity = repository.findWithRulesByGuildId(guildId).orElseGet(() ->
                 ModerationConfig.builder()
                         .guildId(guildId)
                         .build()

@@ -6,8 +6,10 @@ import com.kat.backend.moderation.dto.ModerationConfigDto;
 import com.kat.backend.moderation.dto.ModerationLogPageDto;
 import com.kat.backend.moderation.dto.NukeConfigDto;
 import com.kat.backend.moderation.dto.PurgeConfigDto;
+import com.kat.backend.moderation.dto.SecurityScanResultDto;
 import com.kat.backend.moderation.service.ModerationLogService;
 import com.kat.backend.moderation.service.ModerationService;
+import com.kat.backend.moderation.service.SecurityScanService;
 import com.kat.backend.security.GuildAdmin;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ public class ModerationController {
 
     private final ModerationService moderationService;
     private final ModerationLogService moderationLogService;
+    private final SecurityScanService securityScanService;
 
     @GetMapping
     @GuildAdmin
@@ -96,5 +99,13 @@ public class ModerationController {
             @AuthenticationPrincipal String discordId,
             @Valid @RequestBody NukeConfigDto dto) {
         return ResponseEntity.ok(ApiResponse.ok(moderationService.saveNukeConfig(guildId, dto)));
+    }
+
+    @GetMapping("/security-scan")
+    @GuildAdmin
+    public ResponseEntity<ApiResponse<SecurityScanResultDto>> securityScan(
+            @PathVariable String guildId,
+            @AuthenticationPrincipal String discordId) {
+        return ResponseEntity.ok(ApiResponse.ok(securityScanService.scan(guildId)));
     }
 }

@@ -8,6 +8,9 @@ import com.kat.backend.guild.service.GuildStatsService;
 import com.kat.backend.security.GuildAdmin;
 import jakarta.validation.constraints.Max;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -25,11 +28,11 @@ public class GuildController {
     private final GuildStatsService  guildStatsService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<GuildUserResponse>>> getUserGuilds(
-            @AuthenticationPrincipal String discordId) {
+    public ResponseEntity<Page<GuildUserResponse>> getUserGuilds(
+            @AuthenticationPrincipal String discordId,
+            @PageableDefault(size = 100) Pageable pageable) {
 
-        List<GuildUserResponse> guilds = guildService.getUserGuilds(discordId);
-        return ResponseEntity.ok(ApiResponse.ok(guilds));
+        return ResponseEntity.ok(guildService.getUserGuilds(discordId, pageable));
     }
 
     @GetMapping("/{guildId}/members/joins/monthly")
@@ -44,11 +47,10 @@ public class GuildController {
     @GetMapping("/{guildId}/members/recent")
     public ResponseEntity<ApiResponse<List<RecentMemberDto>>> getRecentMembers(
             @PathVariable String guildId,
-            @Max(100) @RequestParam(defaultValue = "12") int limit,
+            @PageableDefault(size = 50) Pageable pageable,
             @AuthenticationPrincipal String discordId) {
 
-        List<RecentMemberDto> members = guildService.getRecentMembers(guildId, limit);
-        return ResponseEntity.ok(ApiResponse.ok(members));
+        return ResponseEntity.ok(ApiResponse.ok(guildService.getRecentMembers(guildId, pageable).getContent()));
     }
 
     @GetMapping("/{guildId}/members/stats")
@@ -65,29 +67,31 @@ public class GuildController {
     @GuildAdmin
     public ResponseEntity<ApiResponse<List<Map<String, String>>>> getCategories(
             @PathVariable String guildId,
-            @AuthenticationPrincipal String discordId) {
+            @AuthenticationPrincipal String discordId,
+            @PageableDefault(size = 50) Pageable pageable) {
 
-        List<Map<String, String>> categories = botGuildService.getCategories(guildId);
-        return ResponseEntity.ok(ApiResponse.ok(categories));
+        return ResponseEntity.ok(ApiResponse.ok(botGuildService.getCategories(guildId, pageable).getContent()));
     }
 
     @GetMapping("/{guildId}/roles")
     @GuildAdmin
     public ResponseEntity<ApiResponse<List<RoleDto>>> getRoles(
-            @PathVariable String guildId) {
+            @PathVariable String guildId,
+            @PageableDefault(size = 50) Pageable pageable) {
 
         return ResponseEntity.ok(
-                ApiResponse.ok(botGuildService.getRoles(guildId))
+                ApiResponse.ok(botGuildService.getRoles(guildId, pageable).getContent())
         );
     }
 
     @GetMapping("/{guildId}/channels/text")
     @GuildAdmin
     public ResponseEntity<ApiResponse<List<TextChannelDto>>> getTextChannels(
-            @PathVariable String guildId) {
+            @PathVariable String guildId,
+            @PageableDefault(size = 50) Pageable pageable) {
 
         return ResponseEntity.ok(
-                ApiResponse.ok(botGuildService.getTextChannels(guildId))
+                ApiResponse.ok(botGuildService.getTextChannels(guildId, pageable).getContent())
         );
     }
 

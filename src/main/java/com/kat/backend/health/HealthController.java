@@ -21,7 +21,7 @@ public class HealthController {
         try (Connection conn = dataSource.getConnection()) {
             dbUp = conn.isValid(2);
         } catch (Exception e) {
-            // db is down
+
         }
         String status = dbUp ? "UP" : "DOWN";
         int httpStatus = dbUp ? 200 : 503;

@@ -35,4 +35,9 @@ public class AuthController {
         UserResponse user = userService.getByDiscordId(discordId);
         return ResponseEntity.ok(ApiResponse.ok(user));
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout() {
+        return ResponseEntity.ok(ApiResponse.ok(null));
+    }
 }

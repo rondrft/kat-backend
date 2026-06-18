@@ -1,6 +1,5 @@
 package com.kat.backend.guild.service;
 
-import com.kat.backend.common.ApiResponse;
 import com.kat.backend.common.EmojiUtil;
 import com.kat.backend.guild.dto.*;
 import com.kat.backend.guild.entity.GuildAutoRolesConfig;
@@ -26,7 +25,7 @@ public class AutoRolesService {
     @Transactional(readOnly = true)
     @Cacheable(value = "autoRolesConfigs", key = "#guildId", unless = "#result == null")
     public AutoRolesConfigResponse getConfig(String guildId) {
-        GuildAutoRolesConfig config = repository.findById(guildId)
+        GuildAutoRolesConfig config = repository.findWithCollectionsByGuildId(guildId)
                 .orElse(new GuildAutoRolesConfig());
         return toResponse(config);
     }
@@ -34,7 +33,7 @@ public class AutoRolesService {
     @Transactional
     @CacheEvict(value = "autoRolesConfigs", key = "#guildId")
     public AutoRolesConfigResponse saveConfig(String guildId, AutoRolesConfigRequest request) {
-        GuildAutoRolesConfig config = repository.findById(guildId)
+        GuildAutoRolesConfig config = repository.findWithCollectionsByGuildId(guildId)
                 .orElseGet(() -> {
                     GuildAutoRolesConfig c = new GuildAutoRolesConfig();
                     c.setGuildId(guildId);

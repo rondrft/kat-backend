@@ -77,5 +77,10 @@ public class TempVoiceService {
                 .build();
     }
 
+    @Transactional
+    @CacheEvict(value = "tempVoiceConfigs", key = "#guildId")
+    public void deleteAllChannels(String guildId) {
+        botGuildService.deleteAllTempVoiceChannels(guildId);
+    }
 
 }
