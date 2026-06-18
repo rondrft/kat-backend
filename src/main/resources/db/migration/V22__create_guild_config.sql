@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS guild_config (
+    guild_id VARCHAR(255) NOT NULL PRIMARY KEY,
+    prefix   VARCHAR(10)  NOT NULL DEFAULT 'x',
+    locale   VARCHAR(10)  NOT NULL DEFAULT 'en'
+);
