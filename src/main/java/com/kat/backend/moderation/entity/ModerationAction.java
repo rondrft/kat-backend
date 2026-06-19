@@ -4,5 +4,8 @@ public enum ModerationAction {
     MONITOR,
     DELETE,
     TIMEOUT,
-    DELETE_AND_TIMEOUT
+    DELETE_AND_TIMEOUT,
+    WARN,
+    KICK,
+    BAN
 }

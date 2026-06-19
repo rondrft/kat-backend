@@ -28,4 +28,7 @@ public class ModerationConfigDto {
 
     @NotNull @Valid
     private List<ModerationRuleDto> rules;
+
+    private String logChannelId;
+    private String premiumLogChannelId;
 }

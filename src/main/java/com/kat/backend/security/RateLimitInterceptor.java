@@ -24,23 +24,14 @@ public class RateLimitInterceptor implements HandlerInterceptor {
             .maximumSize(50_000)
             .build();
 
-    private Bucket resolveBucket(String key, String path) {
-        return buckets.get(key + ":" + path, k -> createBucket(path));
+    private Bucket resolveBucket(String ip, boolean isAuth) {
+        return buckets.get(ip + (isAuth ? ":auth" : ":api"), k -> createBucket(isAuth));
     }
 
-    private Bucket createBucket(String path) {
-        Bandwidth limit;
-        if (path.contains("/auth/")) {
-            limit = Bandwidth.builder()
-                    .capacity(10)
-                    .refillGreedy(10, Duration.ofMinutes(1))
-                    .build();
-        } else {
-            limit = Bandwidth.builder()
-                    .capacity(30)
-                    .refillGreedy(30, Duration.ofMinutes(1))
-                    .build();
-        }
+    private Bucket createBucket(boolean isAuth) {
+        Bandwidth limit = isAuth
+                ? Bandwidth.builder().capacity(10).refillGreedy(10, Duration.ofMinutes(1)).build()
+                : Bandwidth.builder().capacity(60).refillGreedy(60, Duration.ofMinutes(1)).build();
         return Bucket.builder().addLimit(limit).build();
     }
 
@@ -49,9 +40,14 @@ public class RateLimitInterceptor implements HandlerInterceptor {
                              HttpServletResponse response,
                              Object handler) throws Exception {
 
-        String ip = resolveClientIp(request);
         String path = request.getRequestURI();
-        Bucket bucket = resolveBucket(ip, path);
+        if (path.startsWith("/internal/") || path.startsWith("/actuator/")) {
+            return true;
+        }
+
+        String ip = resolveClientIp(request);
+        boolean isAuth = path.startsWith("/auth/");
+        Bucket bucket = resolveBucket(ip, isAuth);
 
         if (bucket.tryConsume(1)) {
             return true;

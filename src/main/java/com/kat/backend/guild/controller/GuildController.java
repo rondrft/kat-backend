@@ -27,6 +27,13 @@ public class GuildController {
     private final BotGuildService botGuildService;
     private final GuildStatsService  guildStatsService;
 
+    @GetMapping("/{guildId}")
+    @GuildAdmin
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getGuildById(
+            @PathVariable String guildId) {
+        return ResponseEntity.ok(ApiResponse.ok(botGuildService.getGuildInfo(guildId)));
+    }
+
     @GetMapping
     public ResponseEntity<Page<GuildUserResponse>> getUserGuilds(
             @AuthenticationPrincipal String discordId,

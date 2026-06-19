@@ -1,12 +1,7 @@
 package com.kat.backend.moderation.controller;
 
 import com.kat.backend.common.ApiResponse;
-import com.kat.backend.moderation.dto.ModPermissionDto;
-import com.kat.backend.moderation.dto.ModerationConfigDto;
-import com.kat.backend.moderation.dto.ModerationLogPageDto;
-import com.kat.backend.moderation.dto.NukeConfigDto;
-import com.kat.backend.moderation.dto.PurgeConfigDto;
-import com.kat.backend.moderation.dto.SecurityScanResultDto;
+import com.kat.backend.moderation.dto.*;
 import com.kat.backend.moderation.service.ModerationLogService;
 import com.kat.backend.moderation.service.ModerationService;
 import com.kat.backend.moderation.service.SecurityScanService;
@@ -16,6 +11,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/guilds/{guildId}/moderation")
@@ -107,5 +106,93 @@ public class ModerationController {
             @PathVariable String guildId,
             @AuthenticationPrincipal String discordId) {
         return ResponseEntity.ok(ApiResponse.ok(securityScanService.scan(guildId)));
+    }
+
+    @GetMapping("/whitelist")
+    @GuildAdmin
+    public ResponseEntity<ApiResponse<List<ModerationWhitelistDto>>> getWhitelist(
+            @PathVariable String guildId) {
+        return ResponseEntity.ok(ApiResponse.ok(moderationService.getWhitelist(guildId)));
+    }
+
+    @PostMapping("/whitelist")
+    @GuildAdmin
+    public ResponseEntity<ApiResponse<ModerationWhitelistDto>> addWhitelist(
+            @PathVariable String guildId,
+            @RequestBody ModerationWhitelistDto dto) {
+        return ResponseEntity.ok(ApiResponse.ok(moderationService.addWhitelist(guildId, dto)));
+    }
+
+    @DeleteMapping("/whitelist/{entryId}")
+    @GuildAdmin
+    public ResponseEntity<ApiResponse<Void>> removeWhitelist(
+            @PathVariable String guildId,
+            @PathVariable UUID entryId) {
+        moderationService.removeWhitelist(guildId, entryId);
+        return ResponseEntity.ok(ApiResponse.ok(null));
+    }
+
+    @GetMapping("/filters")
+    @GuildAdmin
+    public ResponseEntity<ApiResponse<List<ModerationFilterDto>>> getFilters(
+            @PathVariable String guildId) {
+        return ResponseEntity.ok(ApiResponse.ok(moderationService.getFilters(guildId)));
+    }
+
+    @PostMapping("/filters")
+    @GuildAdmin
+    public ResponseEntity<ApiResponse<ModerationFilterDto>> addFilter(
+            @PathVariable String guildId,
+            @RequestBody ModerationFilterDto dto) {
+        return ResponseEntity.ok(ApiResponse.ok(moderationService.addFilter(guildId, dto)));
+    }
+
+    @PutMapping("/filters/{filterId}")
+    @GuildAdmin
+    public ResponseEntity<ApiResponse<ModerationFilterDto>> updateFilter(
+            @PathVariable String guildId,
+            @PathVariable UUID filterId,
+            @RequestBody ModerationFilterDto dto) {
+        return ResponseEntity.ok(ApiResponse.ok(moderationService.updateFilter(guildId, filterId, dto)));
+    }
+
+    @DeleteMapping("/filters/{filterId}")
+    @GuildAdmin
+    public ResponseEntity<ApiResponse<Void>> deleteFilter(
+            @PathVariable String guildId,
+            @PathVariable UUID filterId) {
+        moderationService.deleteFilter(guildId, filterId);
+        return ResponseEntity.ok(ApiResponse.ok(null));
+    }
+
+    @GetMapping("/auto-punishments")
+    @GuildAdmin
+    public ResponseEntity<ApiResponse<List<ModerationAutoPunishmentDto>>> getAutoPunishments(
+            @PathVariable String guildId) {
+        return ResponseEntity.ok(ApiResponse.ok(moderationService.getAutoPunishments(guildId)));
+    }
+
+    @PutMapping("/auto-punishments")
+    @GuildAdmin
+    public ResponseEntity<ApiResponse<List<ModerationAutoPunishmentDto>>> saveAutoPunishments(
+            @PathVariable String guildId,
+            @RequestBody List<ModerationAutoPunishmentDto> dtos) {
+        return ResponseEntity.ok(ApiResponse.ok(moderationService.saveAutoPunishments(guildId, dtos)));
+    }
+
+    @GetMapping("/log-channel")
+    @GuildAdmin
+    public ResponseEntity<ApiResponse<Map<String, String>>> getLogChannel(
+            @PathVariable String guildId) {
+        return ResponseEntity.ok(ApiResponse.ok(moderationService.getLogChannel(guildId)));
+    }
+
+    @PutMapping("/log-channel")
+    @GuildAdmin
+    public ResponseEntity<ApiResponse<Void>> saveLogChannel(
+            @PathVariable String guildId,
+            @RequestBody Map<String, String> body) {
+        moderationService.saveLogChannel(guildId, body.get("logChannelId"), body.get("premiumLogChannelId"));
+        return ResponseEntity.ok(ApiResponse.ok(null));
     }
 }

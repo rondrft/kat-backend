@@ -38,6 +38,12 @@ public class ModerationConfig {
     @Builder.Default
     private Instant updatedAt = Instant.now();
 
+    @Column(name = "log_channel_id")
+    private String logChannelId;
+
+    @Column(name = "premium_log_channel_id")
+    private String premiumLogChannelId;
+
     @OneToMany(mappedBy = "config", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     @ToString.Exclude

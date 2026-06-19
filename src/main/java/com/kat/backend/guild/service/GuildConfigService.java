@@ -13,16 +13,23 @@ public class GuildConfigService {
 
     public GuildConfig getConfig(String guildId) {
         return repository.findById(guildId)
+                .orElseGet(() -> {
+                    GuildConfig config = GuildConfig.builder()
+                            .guildId(guildId)
+                            .prefix("x")
+                            .locale("en")
+                            .build();
+                    return repository.save(config);
+                });
+    }
+
+    public GuildConfig updateConfig(String guildId, String prefix, String locale) {
+        GuildConfig config = repository.findById(guildId)
                 .orElse(GuildConfig.builder()
                         .guildId(guildId)
                         .prefix("x")
                         .locale("en")
                         .build());
-    }
-
-    public GuildConfig updateConfig(String guildId, String prefix, String locale) {
-        GuildConfig config = repository.findById(guildId)
-                .orElse(GuildConfig.builder().guildId(guildId).build());
 
         if (prefix != null) config.setPrefix(prefix);
         if (locale != null) config.setLocale(locale);

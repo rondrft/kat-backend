@@ -31,6 +31,13 @@ public class BotGuildService {
     @Qualifier("botRestClient")
     private final RestClient botRestClient;
 
+    public Map<String, Object> getGuildInfo(String guildId) {
+        return botRestClient.get()
+                .uri("/internal/guilds/{guildId}", guildId)
+                .retrieve()
+                .body(new ParameterizedTypeReference<Map<String, Object>>() {});
+    }
+
     public Page<Map<String, String>> getCategories(String guildId, Pageable pageable) {
         List<Map<String, String>> categories = botRestClient.get()
                 .uri("/internal/guilds/{guildId}/categories", guildId)

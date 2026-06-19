@@ -1,6 +1,7 @@
 package com.kat.backend.guild.controller;
 
 import com.kat.backend.common.ApiResponse;
+import com.kat.backend.guild.client.GuildConfigBotClient;
 import com.kat.backend.guild.dto.GuildSettingsRequest;
 import com.kat.backend.guild.dto.GuildSettingsResponse;
 import com.kat.backend.guild.entity.GuildConfig;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class GuildSettingsController {
 
     private final GuildConfigService guildConfigService;
+    private final GuildConfigBotClient guildConfigBotClient;
 
     @GetMapping
     public ResponseEntity<ApiResponse<GuildSettingsResponse>> getSettings(
@@ -40,6 +42,8 @@ public class GuildSettingsController {
 
         GuildConfig config = guildConfigService.updateConfig(
                 guildId, request.getPrefix(), request.getLocale());
+
+        guildConfigBotClient.invalidateCache(guildId);
 
         GuildSettingsResponse response = GuildSettingsResponse.builder()
                 .guildId(config.getGuildId())
