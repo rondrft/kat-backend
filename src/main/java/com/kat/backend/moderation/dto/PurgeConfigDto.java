@@ -8,4 +8,9 @@ public class PurgeConfigDto {
     private String allowedRoleId;
     private int maxMessages;
     private int maxAgeSeconds;
+    private boolean purgeUserEnabled;
+    private String purgeUserAllowedRoleId;
+    private String purgeUserAllowedUserId;
+    private int purgeUserMaxMessages;
+    private int purgeUserMaxAgeSeconds;
 }
