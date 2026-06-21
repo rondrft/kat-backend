@@ -24,21 +24,12 @@ public class GuildPermissionClient {
     }
 
     public boolean isAdmin(String guildId, String discordId) {
-        try {
-            Map response = restClient.get()
-                    .uri("/internal/guilds/{guildId}/members/{discordId}/is-admin",
-                            guildId, discordId)
-                    .retrieve()
-                    .body(Map.class);
+        Map response = restClient.get()
+                .uri("/internal/guilds/{guildId}/members/{discordId}/is-admin",
+                        guildId, discordId)
+                .retrieve()
+                .body(Map.class);
 
-            boolean admin = response != null && Boolean.TRUE.equals(response.get("admin"));
-            if (!admin) {
-                log.warn("Bot returned admin=false for user {} in guild {}", discordId, guildId);
-            }
-            return admin;
-        } catch (Exception e) {
-            log.warn("Failed to check admin status for user {} in guild {}: {}", discordId, guildId, e.getMessage());
-            return false;
-        }
+        return response != null && Boolean.TRUE.equals(response.get("admin"));
     }
 }

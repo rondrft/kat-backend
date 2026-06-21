@@ -3,12 +3,14 @@ package com.kat.backend.security;
 import com.kat.backend.guild.service.AdminPermissionService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.server.ResponseStatusException;
@@ -40,9 +42,16 @@ public class GuildAdminAspect {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing guildId");
         }
 
-        if (!adminPermissionService.isAdmin(guildId, discordId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "You don't have admin permissions in this guild");
+        try {
+            if (!adminPermissionService.isAdmin(guildId, discordId)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                        "You don't have admin permissions in this guild");
+            }
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (RestClientException e) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
+                    "Bot is temporarily unavailable");
         }
 
         return joinPoint.proceed();
