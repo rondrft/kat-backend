@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -33,7 +34,8 @@ public class WorkController {
         Map<String, Object> botResponse = botGuildService.getWorkConfig(guildId);
         WorkConfigResponse response = WorkConfigResponse.builder()
                 .guildId((String) botResponse.get("guildId"))
-                .enabled((boolean) botResponse.get("enabled"))
+                .enabled(Boolean.TRUE.equals(botResponse.get("enabled")))
+                .allowedChannelIds(castChannelIds(botResponse.get("allowedChannelIds")))
                 .build();
 
         return ResponseEntity.ok(ApiResponse.ok(response));
@@ -49,8 +51,17 @@ public class WorkController {
         Map<String, Object> botResponse = botGuildService.saveWorkConfig(guildId, request);
         WorkConfigResponse response = WorkConfigResponse.builder()
                 .guildId((String) botResponse.get("guildId"))
-                .enabled((boolean) botResponse.get("enabled"))
+                .enabled(Boolean.TRUE.equals(botResponse.get("enabled")))
+                .allowedChannelIds(castChannelIds(botResponse.get("allowedChannelIds")))
                 .build();
         return ResponseEntity.ok(ApiResponse.ok(response));
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<String> castChannelIds(Object raw) {
+        if (raw instanceof List<?> list) {
+            return list.stream().map(Object::toString).toList();
+        }
+        return List.of();
     }
 }

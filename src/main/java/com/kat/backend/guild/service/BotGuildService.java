@@ -156,9 +156,12 @@ public class BotGuildService {
     }
 
     public Map<String, Object> saveWorkConfig(String guildId, WorkConfigRequest request) {
+        var body = new java.util.HashMap<String, Object>();
+        body.put("enabled", request.isEnabled());
+        body.put("allowedChannelIds", request.getAllowedChannelIds() != null ? request.getAllowedChannelIds() : List.of());
         return botRestClient.put()
                 .uri("/internal/guilds/{guildId}/works", guildId)
-                .body(Map.of("enabled", request.isEnabled()))
+                .body(body)
                 .retrieve()
                 .body(new ParameterizedTypeReference<Map<String, Object>>() {});
     }
