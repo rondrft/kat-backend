@@ -32,4 +32,15 @@ public class GuildPermissionClient {
 
         return response != null && Boolean.TRUE.equals(response.get("admin"));
     }
+
+    public boolean hasAnyRole(String guildId, String discordId, java.util.List<String> roleIds) {
+        String joined = String.join(",", roleIds);
+        Map response = restClient.get()
+                .uri("/internal/guilds/{guildId}/members/{discordId}/has-role?roleIds={roleIds}",
+                        guildId, discordId, joined)
+                .retrieve()
+                .body(Map.class);
+
+        return response != null && Boolean.TRUE.equals(response.get("hasRole"));
+    }
 }

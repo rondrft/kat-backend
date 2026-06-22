@@ -1,6 +1,8 @@
 package com.kat.backend.security;
 
+import com.kat.backend.guild.client.GuildPermissionClient;
 import com.kat.backend.guild.service.AdminPermissionService;
+import com.kat.backend.guild.service.DashboardAccessService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,14 +18,18 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.HandlerMapping;
 
+import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Aspect
 @Component
 @RequiredArgsConstructor
 public class GuildAdminAspect {
 
     private final AdminPermissionService adminPermissionService;
+    private final DashboardAccessService dashboardAccessService;
+    private final GuildPermissionClient guildPermissionClient;
 
     @Around("@annotation(GuildAdmin)")
     public Object checkGuildAdmin(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -43,17 +49,27 @@ public class GuildAdminAspect {
         }
 
         try {
-            if (!adminPermissionService.isAdmin(guildId, discordId)) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                        "You don't have admin permissions in this guild");
+            if (adminPermissionService.isAdmin(guildId, discordId)) {
+                return joinPoint.proceed();
             }
+
+            if (dashboardAccessService.hasUserAccess(guildId, discordId)) {
+                return joinPoint.proceed();
+            }
+
+            List<String> allowedRoles = dashboardAccessService.getAllowedRoleIds(guildId);
+            if (!allowedRoles.isEmpty() && guildPermissionClient.hasAnyRole(guildId, discordId, allowedRoles)) {
+                return joinPoint.proceed();
+            }
+
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "You don't have access to this guild's dashboard");
+
         } catch (ResponseStatusException e) {
             throw e;
         } catch (RestClientException e) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
                     "Bot is temporarily unavailable");
         }
-
-        return joinPoint.proceed();
     }
 }
