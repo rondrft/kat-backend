@@ -21,6 +21,7 @@ public class GuildSettingsController {
     private final GuildConfigBotClient guildConfigBotClient;
 
     @GetMapping
+    @GuildAdmin
     public ResponseEntity<ApiResponse<GuildSettingsResponse>> getSettings(
             @PathVariable String guildId) {
 

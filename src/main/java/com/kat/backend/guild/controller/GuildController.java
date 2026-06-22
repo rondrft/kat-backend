@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/guilds")
 @RequiredArgsConstructor
+@Validated
 public class GuildController {
 
     private final GuildService guildService;
@@ -43,6 +45,7 @@ public class GuildController {
     }
 
     @GetMapping("/{guildId}/members/joins/monthly")
+    @GuildAdmin
     public ResponseEntity<ApiResponse<MonthlyJoinStatsDto>> getMonthlyJoinStats(
             @PathVariable String guildId,
             @AuthenticationPrincipal String discordId) {
@@ -52,6 +55,7 @@ public class GuildController {
     }
 
     @GetMapping("/{guildId}/members/recent")
+    @GuildAdmin
     public ResponseEntity<ApiResponse<List<RecentMemberDto>>> getRecentMembers(
             @PathVariable String guildId,
             @PageableDefault(size = 50) Pageable pageable,
@@ -61,6 +65,7 @@ public class GuildController {
     }
 
     @GetMapping("/{guildId}/members/stats")
+    @GuildAdmin
     public ResponseEntity<ApiResponse<List<MemberJoinStatDto>>> getMemberJoinStats(
             @PathVariable String guildId,
             @Max(365) @RequestParam(defaultValue = "30") int days,
@@ -103,6 +108,7 @@ public class GuildController {
     }
 
     @GetMapping("/{guildId}/stats")
+    @GuildAdmin
     public ResponseEntity<ApiResponse<GuildStatsDto>> getGuildStats(
             @PathVariable String guildId,
             @AuthenticationPrincipal String discordId) {

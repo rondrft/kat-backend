@@ -21,6 +21,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.util.HexFormat;
 import java.util.Map;
@@ -115,9 +116,15 @@ public class PaymentService {
                 return;
             }
 
-            if (signature != null && !signature.isBlank() && props.webhookSecret() != null) {
-                verifySignature(signature, requestId, dataId);
+            boolean hasSecret = props.webhookSecret() != null && !props.webhookSecret().isBlank();
+            if (!hasSecret) {
+                log.error("MERCADOPAGO_WEBHOOK_SECRET not configured — rejecting webhook");
+                throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Webhook processing unavailable");
             }
+            if (signature == null || signature.isBlank()) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing webhook signature");
+            }
+            verifySignature(signature, requestId, dataId);
 
             if (paymentOrderRepository.findByMercadoPagoPaymentId(dataId).isPresent()) {
                 log.debug("Payment {} already processed", dataId);
@@ -167,7 +174,7 @@ public class PaymentService {
         String template = "id:" + dataId + ";request-id:" + (requestId != null ? requestId : "") + ";ts:" + ts;
         String computed = computeHmac(props.webhookSecret(), template);
 
-        if (!computed.equals(v1)) {
+        if (!MessageDigest.isEqual(computed.getBytes(StandardCharsets.UTF_8), v1.getBytes(StandardCharsets.UTF_8))) {
             log.warn("Webhook signature mismatch for dataId={}", dataId);
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Signature verification failed");
         }
