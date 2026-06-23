@@ -20,6 +20,7 @@ public class AttributeEncryptor implements AttributeConverter<String, String> {
     private static final String ALGORITHM = "AES/GCM/NoPadding";
     private static final int GCM_IV_LENGTH = 12;
     private static final int GCM_TAG_LENGTH = 128;
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     private final SecretKey secretKey;
 
@@ -34,7 +35,7 @@ public class AttributeEncryptor implements AttributeConverter<String, String> {
         try {
             Cipher cipher = Cipher.getInstance(ALGORITHM);
             byte[] iv = new byte[GCM_IV_LENGTH];
-            SecureRandom.getInstanceStrong().nextBytes(iv);
+            RANDOM.nextBytes(iv);
             GCMParameterSpec spec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, spec);
             byte[] encrypted = cipher.doFinal(attribute.getBytes(StandardCharsets.UTF_8));

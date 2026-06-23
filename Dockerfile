@@ -13,4 +13,10 @@ COPY --from=builder /app/target/*.jar app.jar
 RUN chown appuser:appgroup app.jar
 USER appuser
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", \
+  "-XX:+UseZGC", \
+  "-XX:MaxRAMPercentage=75.0", \
+  "-XX:InitialRAMPercentage=50.0", \
+  "-XX:+ExitOnOutOfMemoryError", \
+  "-Dfile.encoding=UTF-8", \
+  "-jar", "app.jar"]

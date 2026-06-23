@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.util.Base64;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 @Slf4j
@@ -32,6 +33,7 @@ public class JwtUtil {
         return Jwts.builder()
                 .subject(discordId)
                 .claim("username", username)
+                .id(UUID.randomUUID().toString())
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(secretKey)
@@ -40,6 +42,16 @@ public class JwtUtil {
 
     public String getDiscordIdFromToken(String token) {
         return parseClaims(token).getSubject();
+    }
+
+    public String getJtiFromToken(String token) {
+        return parseClaims(token).getId();
+    }
+
+    public long getRemainingTtlSeconds(String token) {
+        Date expiry = parseClaims(token).getExpiration();
+        long remaining = (expiry.getTime() - System.currentTimeMillis()) / 1000;
+        return Math.max(remaining, 0);
     }
 
     public boolean validateToken(String token) {

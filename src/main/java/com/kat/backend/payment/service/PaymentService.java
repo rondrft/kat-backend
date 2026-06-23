@@ -12,6 +12,7 @@ import com.kat.backend.payment.repository.PaymentOrderRepository;
 import com.kat.backend.premium.service.PremiumService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -154,6 +155,8 @@ public class PaymentService {
 
         } catch (ResponseStatusException e) {
             throw e;
+        } catch (DataIntegrityViolationException e) {
+            log.debug("Duplicate webhook received, ignoring concurrent duplicate");
         } catch (Exception e) {
             log.error("Webhook processing failed: {}", e.getMessage(), e);
         }
@@ -169,6 +172,17 @@ public class PaymentService {
 
         if (ts == null || v1 == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid signature format");
+        }
+
+        long webhookTs;
+        try {
+            webhookTs = Long.parseLong(ts);
+        } catch (NumberFormatException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid signature timestamp");
+        }
+        if (Math.abs(System.currentTimeMillis() / 1000 - webhookTs) > 300) {
+            log.warn("Webhook timestamp out of acceptable range for dataId={}", dataId);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Webhook timestamp expired");
         }
 
         String template = "id:" + dataId + ";request-id:" + (requestId != null ? requestId : "") + ";ts:" + ts;

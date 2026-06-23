@@ -54,7 +54,10 @@ public class BoosterService {
                         .build());
     }
 
-    @CacheEvict(value = {"boosterSettings", "boosterCustomRoles"}, key = "#guildId")
+    @org.springframework.cache.annotation.Caching(evict = {
+        @CacheEvict(value = "boosterSettings", key = "#guildId"),
+        @CacheEvict(value = "boosterCustomRoles", allEntries = true)
+    })
     public BoosterConfigResponse updateSettings(String guildId, BoosterConfigRequest request) {
         BoosterConfig config = boosterConfigRepository.findById(guildId)
                 .orElse(BoosterConfig.builder().guildId(guildId).build());

@@ -20,6 +20,7 @@ import java.util.List;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final JwtDenylistService jwtDenylistService;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -30,25 +31,23 @@ public class JwtFilter extends OncePerRequestFilter {
         String token = extractToken(request);
 
         if (token != null && jwtUtil.validateToken(token)) {
-            String discordId = jwtUtil.getDiscordIdFromToken(token);
-            SecurityContextHolder.getContext().setAuthentication(
-                    new UsernamePasswordAuthenticationToken(discordId, null, List.of()));
+            String jti = jwtUtil.getJtiFromToken(token);
+            if (!jwtDenylistService.isDenylisted(jti)) {
+                String discordId = jwtUtil.getDiscordIdFromToken(token);
+                SecurityContextHolder.getContext().setAuthentication(
+                        new UsernamePasswordAuthenticationToken(discordId, null, List.of()));
+            }
         }
 
         filterChain.doFilter(request, response);
     }
 
     private String extractToken(HttpServletRequest request) {
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if ("kat-access-token".equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
+        if (request.getCookies() == null) return null;
+        for (Cookie cookie : request.getCookies()) {
+            if ("kat-access-token".equals(cookie.getName())) {
+                return cookie.getValue();
             }
-        }
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            return authHeader.substring(7);
         }
         return null;
     }

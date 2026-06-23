@@ -33,6 +33,7 @@ public class BoosterController {
     }
 
     @GetMapping
+    @GuildAdmin
     public ResponseEntity<ApiResponse<Page<BoosterCustomRoleResponse>>> getAllCustomRoles(
             @PathVariable String guildId,
             @AuthenticationPrincipal String discordId,
