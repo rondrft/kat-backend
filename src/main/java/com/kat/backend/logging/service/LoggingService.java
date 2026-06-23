@@ -12,6 +12,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 import java.util.Optional;
@@ -52,9 +54,13 @@ public class LoggingService {
         }
 
         LoggingConfigDto saved = toDto(repository.save(config));
-
-        botClient.notifyConfigSaved(guildId, dto.getDefaultChannel());
-
+        String defaultChannel = dto.getDefaultChannel();
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                botClient.notifyConfigSaved(guildId, defaultChannel);
+            }
+        });
         return saved;
     }
 

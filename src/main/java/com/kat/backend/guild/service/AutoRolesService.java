@@ -30,7 +30,6 @@ public class AutoRolesService {
         return toResponse(config);
     }
 
-    @Transactional
     @CacheEvict(value = "autoRolesConfigs", key = "#guildId")
     public AutoRolesConfigResponse saveConfig(String guildId, AutoRolesConfigRequest request) {
         GuildAutoRolesConfig config = repository.findWithCollectionsByGuildId(guildId)

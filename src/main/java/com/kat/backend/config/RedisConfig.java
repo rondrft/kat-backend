@@ -51,12 +51,16 @@ public class RedisConfig {
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(RedisSerializer.json()));
 
         Map<String, RedisCacheConfiguration> configs = Map.of(
-                "adminPermissions", defaults.entryTtl(Duration.ofMinutes(2)),
-                "boosterSettings", defaults.entryTtl(Duration.ofMinutes(10)),
+                "adminPermissions",   defaults.entryTtl(Duration.ofMinutes(2)),
+                "boosterSettings",    defaults.entryTtl(Duration.ofMinutes(10)),
                 "boosterCustomRoles", defaults.entryTtl(Duration.ofMinutes(5)),
-                "welcomeConfigs", defaults.entryTtl(Duration.ofMinutes(10)),
-                "tempVoiceConfigs", defaults.entryTtl(Duration.ofMinutes(10)),
-                "autoRolesConfigs", defaults.entryTtl(Duration.ofMinutes(10))
+                "welcomeConfigs",     defaults.entryTtl(Duration.ofMinutes(10)),
+                "tempVoiceConfigs",   defaults.entryTtl(Duration.ofMinutes(10)),
+                "autoRolesConfigs",   defaults.entryTtl(Duration.ofMinutes(10)),
+                "moderationConfigs",  defaults.entryTtl(Duration.ofMinutes(10)),
+                "loggingConfigs",     defaults.entryTtl(Duration.ofMinutes(10)),
+                "ticketConfigs",      defaults.entryTtl(Duration.ofMinutes(10)),
+                "dashboardRoles",     defaults.entryTtl(Duration.ofMinutes(5))
         );
 
         return RedisCacheManager.builder(factory)

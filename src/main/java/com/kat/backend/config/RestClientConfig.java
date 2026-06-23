@@ -13,11 +13,14 @@ public class RestClientConfig {
 
     @Bean
     public RestClient restClient() {
+        HttpClient httpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
+        JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(httpClient);
+        factory.setReadTimeout(Duration.ofSeconds(15));
+
         return RestClient.builder()
-                .requestFactory(new JdkClientHttpRequestFactory(
-                        HttpClient.newBuilder()
-                                .connectTimeout(Duration.ofSeconds(10))
-                                .build()))
+                .requestFactory(factory)
                 .build();
     }
 }

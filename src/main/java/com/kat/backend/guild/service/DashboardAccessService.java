@@ -45,17 +45,17 @@ public class DashboardAccessService {
         roleRepository.deleteByIdGuildId(guildId);
 
         if (allowedUserIds != null) {
-            allowedUserIds.stream()
+            userRepository.saveAll(allowedUserIds.stream()
                     .distinct()
                     .map(uid -> new DashboardAccessUser(new DashboardAccessUser.Id(guildId, uid)))
-                    .forEach(userRepository::save);
+                    .toList());
         }
 
         if (allowedRoleIds != null) {
-            allowedRoleIds.stream()
+            roleRepository.saveAll(allowedRoleIds.stream()
                     .distinct()
                     .map(rid -> new DashboardAccessRole(new DashboardAccessRole.Id(guildId, rid)))
-                    .forEach(roleRepository::save);
+                    .toList());
         }
     }
 }

@@ -1,11 +1,9 @@
 package com.kat.backend.moderation.service;
 
-import com.kat.backend.moderation.repository.ModerationLogRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -16,20 +14,18 @@ import java.time.temporal.ChronoUnit;
 public class ModerationLogCleanupService {
 
     private static final int RETENTION_DAYS = 30;
-    private static final int BATCH_SIZE = 1000;
 
-    private final ModerationLogRepository repository;
+    private final ModerationLogCleanupTransactionService transactionService;
 
     @Scheduled(cron = "0 0 3 * * *")
-    @Transactional
     public void cleanOldLogs() {
         Instant cutoff = Instant.now().minus(RETENTION_DAYS, ChronoUnit.DAYS);
         int totalDeleted = 0;
         int deleted;
         do {
-            deleted = repository.deleteOlderThan(cutoff, BATCH_SIZE);
+            deleted = transactionService.deleteNextBatch(cutoff);
             totalDeleted += deleted;
-        } while (deleted == BATCH_SIZE);
+        } while (deleted == ModerationLogCleanupTransactionService.BATCH_SIZE);
         log.info("Moderation log cleanup: deleted {} entries older than {} days", totalDeleted, RETENTION_DAYS);
     }
 }

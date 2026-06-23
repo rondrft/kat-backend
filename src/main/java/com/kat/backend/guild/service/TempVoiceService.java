@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
@@ -26,7 +25,6 @@ public class TempVoiceService {
                 .orElse(defaultResponse(guildId));
     }
 
-    @Transactional
     @CacheEvict(value = "tempVoiceConfigs", key = "#guildId")
     public TempVoiceConfigResponse saveConfig(String guildId, TempVoiceConfigRequest request) {
         GuildTempVoiceConfig config = repository.findById(guildId)
@@ -77,7 +75,6 @@ public class TempVoiceService {
                 .build();
     }
 
-    @Transactional
     @CacheEvict(value = "tempVoiceConfigs", key = "#guildId")
     public void deleteAllChannels(String guildId) {
         botGuildService.deleteAllTempVoiceChannels(guildId);

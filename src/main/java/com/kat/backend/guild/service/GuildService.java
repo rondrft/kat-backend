@@ -45,12 +45,12 @@ public class GuildService {
         LocalDate start = today.minusDays(29);
         LocalDateTime since = start.atStartOfDay();
 
-        Map<LocalDate, Long> countsByDay = guildMemberRepository
-                .findByGuildIdAndJoinedAtGreaterThanEqual(guildId, since)
-                .stream()
-                .collect(Collectors.groupingBy(
-                        m -> m.getJoinedAt().toLocalDate(),
-                        Collectors.counting()));
+        Map<LocalDate, Long> countsByDay = new java.util.HashMap<>();
+        for (Object[] row : guildMemberRepository.countJoinsByDay(guildId, since)) {
+            LocalDate day = ((java.sql.Date) row[0]).toLocalDate();
+            long count = ((Number) row[1]).longValue();
+            countsByDay.put(day, count);
+        }
 
         List<DailyJoinDto> days = new ArrayList<>();
         long total = 0;
@@ -175,12 +175,10 @@ public class GuildService {
         LocalDate start = today.minusDays(windowDays - 1L);
         LocalDateTime since = start.atStartOfDay();
 
-        Map<LocalDate, Long> countsByDay = guildMemberRepository
-                .findByGuildIdAndJoinedAtGreaterThanEqual(guildId, since)
-                .stream()
-                .collect(Collectors.groupingBy(
-                        m -> m.getJoinedAt().toLocalDate(),
-                        Collectors.counting()));
+        Map<LocalDate, Long> countsByDay = new java.util.HashMap<>();
+        for (Object[] row : guildMemberRepository.countJoinsByDay(guildId, since)) {
+            countsByDay.put(((java.sql.Date) row[0]).toLocalDate(), ((Number) row[1]).longValue());
+        }
 
         List<MemberJoinStatDto> stats = new ArrayList<>();
         for (LocalDate day = start; !day.isAfter(today); day = day.plusDays(1)) {

@@ -9,6 +9,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.ArrayList;
 
@@ -55,17 +57,20 @@ public class TicketService {
         config.setSupportRoleIds(new ArrayList<>(request.getSupportRoleIds()));
 
         TicketConfig saved = repository.save(config);
-
-        if (nowEnabled) {
-            ticketBotClient.createOrUpdatePanel(guildId, toResponse(saved));
-        } else if (wasEnabled) {
-            ticketBotClient.deletePanel(guildId);
-        }
-
-        return toResponse(saved);
+        TicketConfigResponse response = toResponse(saved);
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                if (nowEnabled) {
+                    ticketBotClient.createOrUpdatePanel(guildId, response);
+                } else if (wasEnabled) {
+                    ticketBotClient.deletePanel(guildId);
+                }
+            }
+        });
+        return response;
     }
 
-    @Transactional
     @CacheEvict(value = "ticketConfigs", key = "#guildId")
     public void resetSystem(String guildId) {
         ticketBotClient.deleteAllTickets(guildId);

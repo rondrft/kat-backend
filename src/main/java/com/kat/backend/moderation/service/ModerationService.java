@@ -12,6 +12,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
@@ -51,7 +53,12 @@ public class ModerationService {
         entity.setUpdatedAt(Instant.now());
         ModerationConfig saved = repository.save(entity);
         log.info("Moderation config saved for guild {}", guildId);
-        moderationBotClient.invalidateModerationCache(guildId);
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                moderationBotClient.invalidateModerationCache(guildId);
+            }
+        });
         return mapper.toDto(saved);
     }
 
@@ -59,7 +66,6 @@ public class ModerationService {
         return moderationBotClient.getPermissions(guildId);
     }
 
-    @Transactional
     public ModPermissionDto savePermissions(String guildId, ModPermissionDto dto) {
         moderationBotClient.savePermissions(guildId, dto);
         return dto;
@@ -69,7 +75,6 @@ public class ModerationService {
         return moderationBotClient.getPurgeConfig(guildId);
     }
 
-    @Transactional
     public PurgeConfigDto savePurgeConfig(String guildId, PurgeConfigDto dto) {
         moderationBotClient.savePurgeConfig(guildId, dto);
         return dto;
@@ -79,7 +84,6 @@ public class ModerationService {
         return moderationBotClient.getNukeConfig(guildId);
     }
 
-    @Transactional
     public NukeConfigDto saveNukeConfig(String guildId, NukeConfigDto dto) {
         moderationBotClient.saveNukeConfig(guildId, dto);
         return dto;
