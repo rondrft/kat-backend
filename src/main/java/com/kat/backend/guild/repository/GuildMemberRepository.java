@@ -18,10 +18,10 @@ public interface GuildMemberRepository extends JpaRepository<GuildMember, String
                                           Pageable pageable);
 
     @Query(value = """
-            SELECT CAST(joined_at AS date) AS day, COUNT(*) AS cnt
+            SELECT to_char(joined_at, 'YYYY-MM-DD') AS day, COUNT(*) AS cnt
             FROM guild_members
             WHERE guild_id = :guildId AND joined_at >= :since
-            GROUP BY CAST(joined_at AS date)
+            GROUP BY to_char(joined_at, 'YYYY-MM-DD')
             """, nativeQuery = true)
     List<Object[]> countJoinsByDay(@Param("guildId") String guildId,
                                    @Param("since") LocalDateTime since);

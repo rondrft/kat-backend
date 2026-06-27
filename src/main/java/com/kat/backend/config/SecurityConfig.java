@@ -36,6 +36,7 @@ public class SecurityConfig {
                         .requestMatchers("/internal/**").permitAll()
                         .requestMatchers("/health").permitAll()
                         .requestMatchers("/payment/webhook").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/leaderboard/servers").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/info", "/actuator/metrics/**").permitAll()
                         .anyRequest().authenticated()
                 )

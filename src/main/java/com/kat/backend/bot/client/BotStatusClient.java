@@ -18,12 +18,18 @@ public class BotStatusClient {
 
     public BotStatusDto getStatus() {
         try {
-            return restClient.get()
+            BotStatusDto status = restClient.get()
                     .uri("/internal/bot/status")
                     .retrieve()
                     .body(BotStatusDto.class);
+            log.debug("Bot status fetched: {}/{} shards connected, {} guilds",
+                    status != null ? status.getConnectedShards() : 0,
+                    status != null ? status.getTotalShards() : 0,
+                    status != null ? status.getTotalGuilds() : 0);
+            return status;
         } catch (Exception e) {
-            log.error("Failed to fetch bot status: {}", e.getMessage());
+            log.error("Failed to fetch bot status from {}: {}", 
+                    "/internal/bot/status", e.getMessage());
             return null;
         }
     }

@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 public class BrandingController {
 
     private static final int MAX_NAME_LENGTH = 100;
-    private static final int MAX_DESCRIPTION_LENGTH = 500;
     private static final String URL_PATTERN = "^https?://.+";
 
     private final BrandingBotClient brandingBotClient;
@@ -35,14 +34,8 @@ public class BrandingController {
         if (request.botName() != null && request.botName().length() > MAX_NAME_LENGTH) {
             return ResponseEntity.badRequest().body(ApiResponse.error("Bot name must be 100 characters or fewer"));
         }
-        if (request.description() != null && request.description().length() > MAX_DESCRIPTION_LENGTH) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("Description must be 500 characters or fewer"));
-        }
         if (request.avatarUrl() != null && !request.avatarUrl().matches(URL_PATTERN)) {
             return ResponseEntity.badRequest().body(ApiResponse.error("Avatar URL must start with http:// or https://"));
-        }
-        if (request.bannerUrl() != null && !request.bannerUrl().matches(URL_PATTERN)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("Banner URL must start with http:// or https://"));
         }
 
         return ResponseEntity.ok(ApiResponse.ok(brandingBotClient.updateBranding(guildId, request)));

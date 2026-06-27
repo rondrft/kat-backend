@@ -57,6 +57,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponse<Void>> handleRuntime(RuntimeException ex) {
+        if (ex.getMessage() != null && ex.getMessage().contains("anonymousUser")) {
+            log.warn("Unauthenticated access: {}", ex.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Not authenticated"));
+        }
         log.error("Runtime error: {}", ex.getMessage());
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)

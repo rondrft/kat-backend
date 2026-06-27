@@ -6,7 +6,11 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "guild_members")
+@Table(name = "guild_members", indexes = {
+        @Index(name = "idx_guild_members_guild", columnList = "guild_id"),
+        @Index(name = "idx_guild_members_user", columnList = "discord_user_id"),
+        @Index(name = "idx_guild_members_joined", columnList = "joined_at")
+})
 @Data
 public class GuildMember {
 

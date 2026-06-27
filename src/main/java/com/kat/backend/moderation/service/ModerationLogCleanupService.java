@@ -19,13 +19,17 @@ public class ModerationLogCleanupService {
 
     @Scheduled(cron = "0 0 3 * * *")
     public void cleanOldLogs() {
-        Instant cutoff = Instant.now().minus(RETENTION_DAYS, ChronoUnit.DAYS);
-        int totalDeleted = 0;
-        int deleted;
-        do {
-            deleted = transactionService.deleteNextBatch(cutoff);
-            totalDeleted += deleted;
-        } while (deleted == ModerationLogCleanupTransactionService.BATCH_SIZE);
-        log.info("Moderation log cleanup: deleted {} entries older than {} days", totalDeleted, RETENTION_DAYS);
+        try {
+            Instant cutoff = Instant.now().minus(RETENTION_DAYS, ChronoUnit.DAYS);
+            int totalDeleted = 0;
+            int deleted;
+            do {
+                deleted = transactionService.deleteNextBatch(cutoff);
+                totalDeleted += deleted;
+            } while (deleted == ModerationLogCleanupTransactionService.BATCH_SIZE);
+            log.info("Moderation log cleanup: deleted {} entries older than {} days", totalDeleted, RETENTION_DAYS);
+        } catch (Exception e) {
+            log.error("Moderation log cleanup failed: {}", e.getMessage(), e);
+        }
     }
 }

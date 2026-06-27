@@ -9,7 +9,10 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "moderation_filter")
+@Table(name = "moderation_filter", indexes = {
+        @Index(name = "idx_moderation_filter_guild", columnList = "guild_id"),
+        @Index(name = "idx_moderation_filter_enabled", columnList = "guild_id, enabled")
+})
 @Data
 @Builder
 @NoArgsConstructor

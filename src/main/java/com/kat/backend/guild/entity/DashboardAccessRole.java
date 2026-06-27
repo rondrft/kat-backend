@@ -11,7 +11,9 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "dashboard_access_roles")
+@Table(name = "dashboard_access_roles", indexes = {
+        @Index(name = "idx_dash_access_role_guild", columnList = "guild_id")
+})
 public class DashboardAccessRole {
 
     @EmbeddedId

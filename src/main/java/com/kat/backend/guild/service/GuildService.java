@@ -19,12 +19,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +35,12 @@ import java.util.stream.Collectors;
 public class GuildService {
 
     private static final long ADMINISTRATOR_PERMISSION = 0x8;
+
+    private final Cache<String, List<DiscordGuildResponse>> userGuildCache = Caffeine.newBuilder()
+            .expireAfterWrite(5, TimeUnit.MINUTES)
+            .maximumSize(1_000)
+            .recordStats()
+            .build();
 
     private final DiscordClient discordClient;
     private final UserRepository userRepository;
@@ -47,7 +56,7 @@ public class GuildService {
 
         Map<LocalDate, Long> countsByDay = new java.util.HashMap<>();
         for (Object[] row : guildMemberRepository.countJoinsByDay(guildId, since)) {
-            LocalDate day = ((java.sql.Date) row[0]).toLocalDate();
+            LocalDate day = LocalDate.parse((String) row[0]);
             long count = ((Number) row[1]).longValue();
             countsByDay.put(day, count);
         }
@@ -116,7 +125,8 @@ public class GuildService {
         User user = userRepository.findByDiscordId(discordId)
                 .orElseThrow(() -> new RuntimeException("User not found: " + discordId));
 
-        List<DiscordGuildResponse> rawGuilds = discordClient.getUserGuilds(user.getDiscordAccessToken());
+        List<DiscordGuildResponse> rawGuilds = userGuildCache.get(discordId,
+                id -> discordClient.getUserGuilds(user.getDiscordAccessToken()));
 
         Set<String> botGuildIds = fetchBotGuildIds();
 
@@ -177,7 +187,7 @@ public class GuildService {
 
         Map<LocalDate, Long> countsByDay = new java.util.HashMap<>();
         for (Object[] row : guildMemberRepository.countJoinsByDay(guildId, since)) {
-            countsByDay.put(((java.sql.Date) row[0]).toLocalDate(), ((Number) row[1]).longValue());
+            countsByDay.put(LocalDate.parse((String) row[0]), ((Number) row[1]).longValue());
         }
 
         List<MemberJoinStatDto> stats = new ArrayList<>();

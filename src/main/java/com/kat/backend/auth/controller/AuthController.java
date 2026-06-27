@@ -74,6 +74,11 @@ public class AuthController {
     public ResponseEntity<ApiResponse<UserResponse>> getMe(
             @AuthenticationPrincipal String discordId) {
 
+        if (discordId == null || "anonymousUser".equals(discordId)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Not authenticated"));
+        }
+
         UserResponse user = userService.getByDiscordId(discordId);
         return ResponseEntity.ok(ApiResponse.ok(user));
     }
